@@ -1,0 +1,137 @@
+/* 12-column logical grid, verified against the real Figma frame
+   (get_metadata on 313:2) -- same system as the homepage. Column spans
+   below are all verified this same way, not eyeballed. */
+/* padding-top clears .site-header (position:fixed, 36px tall) -- same
+   deliberate deviation from Figma's own measurement (320) as .hero on
+   the homepage, using --spacing-240 instead, for consistency across
+   pages. padding-bottom is breathing room before .site-footer, same
+   token/role as .intro's own bottom padding before .narrative on the
+   homepage. */
+.archive__container {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  padding: var(--spacing-240) var(--spacing-10) var(--spacing-320);
+}
+
+/* Static structure only -- both this and .archive__toc are annotated in
+   Figma to stay pinned on screen while only the article text scrolls
+   (GSAP ScrollTrigger.pin, NOT CSS position:sticky -- breaks under this
+   site's ScrollSmoother, same reasoning as .narrative's header). Not
+   built here, that's the animation phase. */
+.archive__credit {
+  grid-column: 3 / span 2;
+  grid-row: 1;
+}
+
+/* "Archive" is the page's <h1> -- the design treats it as plain body
+   text (same size/weight as everything else), so this styling exists
+   purely to cancel the browser's default heading appearance, not to
+   create a new visual treatment. */
+.archive__credit-title,
+.archive__credit-text {
+  font-size: var(--font-body);
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  color: var(--black);
+}
+
+.archive__nav {
+  grid-column: 5 / span 2;
+  grid-row: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-24);
+}
+
+.archive__nav-title {
+  font-size: var(--font-body);
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  color: var(--black);
+}
+
+.archive__nav-links {
+  display: flex;
+  flex-direction: column;
+}
+
+.archive__nav-link {
+  font-size: var(--font-body);
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  color: var(--gray-text);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.archive__nav-link--active {
+  color: var(--black);
+}
+
+/* Matches the real Figma frame exactly (4 of 12 columns, starting at
+   column 7) -- verified via get_metadata, not eyeballed. */
+.archive__content {
+  grid-column: 7 / span 4;
+  grid-row: 1;
+}
+
+.archive__toc {
+  grid-column: 11 / span 2;
+  grid-row: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.archive__toc-links {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.archive__toc-link {
+  font-size: var(--font-body);
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  color: var(--black);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+/* 96px between articles, verified against the real Figma frame
+   (article 2 starts exactly 96px below article 1 ends). */
+.archive__article-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-96);
+}
+
+.archive__article {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-24);
+}
+
+.archive__article-title {
+  font-size: var(--font-body);
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  color: var(--black);
+}
+
+.archive__article-paragraph {
+  font-size: var(--font-body);
+  font-weight: 500;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  color: var(--black);
+  margin-bottom: var(--spacing-24);
+}
+
+.archive__article-paragraph:last-child {
+  margin-bottom: 0;
+}
+
+.archive__article-paragraph--first {
+  text-indent: var(--spacing-40);
+}

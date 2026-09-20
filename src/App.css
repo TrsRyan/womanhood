@@ -91,6 +91,7 @@
 
 .hero__tagline {
   grid-column: 3;
+  grid-row: 1;
   text-indent: var(--spacing-40);
   font-size: var(--font-body);
   line-height: 1.15;
@@ -170,6 +171,7 @@
 
 .intro__image--primary {
   grid-column: 1 / span 4;
+  grid-row: 1;
 }
 
 /* padding-left, not a grid gap -- same "spacing lives inside the cell,
@@ -179,6 +181,7 @@
    it with a track gutter. */
 .intro__image--secondary {
   grid-column: 5 / span 2;
+  grid-row: 1;
   padding-left: var(--spacing-10);
 }
 
@@ -218,11 +221,13 @@
 
 .intro__paragraph--first {
   grid-column: 3;
+  grid-row: 1;
   text-indent: var(--spacing-40);
 }
 
 .intro__paragraph--second {
   grid-column: 4;
+  grid-row: 1;
 }
 
 /* Static structure only -- the header becoming sticky/pinned as you
@@ -261,14 +266,17 @@
 
 .narrative__index-label {
   grid-column: 1;
+  grid-row: 1;
 }
 
 .narrative__title {
   grid-column: 2;
+  grid-row: 1;
 }
 
 .narrative__description {
   grid-column: 3;
+  grid-row: 1;
   text-indent: var(--spacing-40);
 }
 
