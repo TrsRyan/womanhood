@@ -52,6 +52,27 @@
   border-left: 1px solid var(--grid-line);
 }
 
+/* Column COUNT is structural (36/24/12), same as the layout's own
+   column-count switch -- can't fade between counts, so this hides the
+   extra lines at the same 1024/768 breakpoints instead of rendering a
+   different DOM per breakpoint (all 36 lines always render; JSX stays
+   identical at every width). Each visible line is flex:1, so the
+   remaining ones redistribute evenly on their own once the rest are
+   hidden -- no separate width math needed. Same technique already
+   verified against a real reference site's own CSS (fabric.codebydennis.com,
+   nth-last-child progressively hiding lines) earlier in the project. */
+@media (max-width: 1023.98px) {
+  .grid-overlay__line:nth-child(n + 25) {
+    display: none;
+  }
+}
+
+@media (max-width: 767.98px) {
+  .grid-overlay__line:nth-child(n + 13) {
+    display: none;
+  }
+}
+
 /* Every image (and any text sitting on one) stays above .grid-overlay,
    site-wide, no exceptions -- one shared rule instead of repeating
    position+z-index on each. Being position:relative/absolute with

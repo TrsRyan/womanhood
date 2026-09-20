@@ -6,18 +6,33 @@
   --white: #ffffff;
   --grid-line: rgba(0, 0, 0, 0.08);
 
-  /* échelle d'espacement Figma (base 1512px), en vw pour rester proportionnelle à la fenêtre */
+  /* Échelle d'espacement Figma : une échelle FIXE de tailles nommées
+     (confirmé via get_variable_defs, comparé sur les 3 largeurs de
+     référence desktop/tablette/mobile), pas un système qui rétrécit en
+     continu. --spacing-10/24/96 et --font-body sont identiques aux 3
+     paliers -- fixés ici en dur, une fois pour toutes. Les tailles qui
+     changent réellement entre paliers (16/40/160/240/320,
+     --font-hero-title) restent en vw pour l'instant, en attendant leur
+     vérification palier par palier (voir la mémoire du projet) --
+     elles seront converties en valeurs fixes, avec un @media par
+     palier, au fur et à mesure. Au-delà de 1512px, une zone séparée
+     ("poster scaling", décidée à part) fera grandir ces valeurs en
+     continu jusqu'à un plafond à 1920px -- ce n'est PAS la même chose
+     que ce système d'échelle fixe. */
+  --spacing-10: 10px;
+  --spacing-24: 24px;
+  --spacing-96: 96px;
+
   --spacing-4: 0.265vw;
-  --spacing-10: 0.661vw;
+  --spacing-14: 14px;
   --spacing-16: 1.058vw;
-  --spacing-24: 1.587vw;
   --spacing-40: 2.646vw;
-  --spacing-96: 6.349vw;
-  --spacing-160: 10.582vw;
+  --spacing-72: 72px;
+  --spacing-160: 160px;
   --spacing-240: 15.873vw;
   --spacing-320: 21.164vw;
 
-  --font-body: 0.926vw;
+  --font-body: 14px;
   --font-hero-title: 17.65vw;
 
   color-scheme: light;
