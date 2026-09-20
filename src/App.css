@@ -24,8 +24,56 @@
   gap: var(--spacing-4);
 }
 
-.hero {
+/* Site-wide, replaces the old per-section .hero__grid -- one grid,
+   pinned to the screen (not the page), so it always spans exactly the
+   viewport no matter how tall the page grows. Kept a direct child of
+   the root (not nested in .hero or anything that might later get a
+   GSAP transform) -- a transformed ancestor would break its `fixed`
+   positioning.
+   z-index:1 puts it above every section's own background (which sit
+   at the default stacking level, z-index:auto) -- without this, a
+   section positioned later in the DOM with an opaque background (see
+   .site-footer) paints over the grid instead of the other way round. */
+.grid-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  display: flex;
+  padding-inline: var(--spacing-10);
+  pointer-events: none;
+}
+
+.grid-overlay__line {
+  flex: 1;
+  border-right: 1px solid var(--grid-line);
+}
+
+.grid-overlay__line:first-child {
+  border-left: 1px solid var(--grid-line);
+}
+
+/* Every image (and any text sitting on one) stays above .grid-overlay,
+   site-wide, no exceptions -- one shared rule instead of repeating
+   position+z-index on each. Being position:relative/absolute with
+   z-index:auto puts an element at the grid's own default stack level;
+   losing the DOM-order tie-break once the grid got z-index:1 (needed so
+   it shows over .site-footer's opaque background) would otherwise bury
+   all of these under the grid lines. Section BACKGROUND colors (.hero,
+   .site-footer) are the one deliberate exception -- the grid stays above
+   those, same as it already does over .site-footer's white fill. */
+.transition-image__img,
+.intro__media,
+.intro__text,
+.narrative,
+.documentary,
+.pin-gallery__stage,
+.site-footer__legacy,
+.site-footer__wordmark-clip {
   position: relative;
+  z-index: 1;
+}
+
+.hero {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
@@ -33,26 +81,6 @@
   height: 100vh;
   padding: var(--spacing-240) var(--spacing-10) var(--spacing-16) var(--spacing-10);
   background: var(--white);
-}
-
-.hero__grid {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  padding-inline: var(--spacing-10);
-  /* Purely decorative (aria-hidden) -- without this, being absolutely
-     positioned makes it paint (and hit-test) above the normal-flow text
-     below it, blocking selection/clicks on everything in .hero. */
-  pointer-events: none;
-}
-
-.hero__grid-column {
-  flex: 1;
-  border-right: 1px solid var(--grid-line);
-}
-
-.hero__grid-column:first-child {
-  border-left: 1px solid var(--grid-line);
 }
 
 .hero__tagline-row {
@@ -103,5 +131,373 @@
 }
 
 .hero__title::after {
+  margin-top: -0.145em;
+}
+
+.transition-image__img {
+  display: block;
+  width: 100%;
+  height: 100vh;
+  object-fit: cover;
+}
+
+.intro {
+  padding: var(--spacing-10) var(--spacing-10) var(--spacing-320) var(--spacing-10);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-24);
+}
+
+/* Same "cadencé sur la grille" pattern as .documentary/.pin-gallery --
+   verified against the real Figma frame (get_metadata on 225:50): the
+   two images sit on the site's 12-column logical grid, not at hand-
+   measured widths. Image 1 spans 4 columns, image 2 spans the next 2 --
+   columns 7-12 are deliberately empty here (the pair only fills the
+   left half of the 1492px frame, matching Figma exactly). align-items:
+   start keeps image 2 (shorter) top-aligned instead of grid's default
+   stretch, since the two are genuinely different heights, not a
+   stretch-to-match effect. */
+.intro__media {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  align-items: start;
+}
+
+.intro__image {
+  object-fit: cover;
+  aspect-ratio: 3 / 4; /* Figma exports 497/663 and 239/319 -- both ~3/4, rounding noise, not real ratios */
+}
+
+.intro__image--primary {
+  grid-column: 1 / span 4;
+}
+
+/* padding-left, not a grid gap -- same "spacing lives inside the cell,
+   never between cells" rule as .documentary__quote/.intro__paragraph.
+   The image renders 10px narrower than its 2-column span, matching
+   Figma's real 10px gap (497 -> 507) exactly instead of approximating
+   it with a track gutter. */
+.intro__image--secondary {
+  grid-column: 5 / span 2;
+  padding-left: var(--spacing-10);
+}
+
+.intro__copyright {
+  position: absolute;
+  top: 0;
+  right: 0;
+  font-size: var(--font-body);
+  letter-spacing: -0.02em;
+}
+
+/* Same subgrid pattern as .hero__tagline-row: cells stay contiguous on
+   the site's invisible 4-column grid, spacing comes from padding-right
+   inside each cell, never from a gap between them. */
+.intro__text {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  width: 100%;
+}
+
+.intro__index-label {
+  position: absolute;
+  top: 0;
+  right: calc(50% + var(--spacing-10));
+  color: var(--gray-text);
+  font-size: var(--font-body);
+  letter-spacing: -0.02em;
+}
+
+.intro__paragraph {
+  font-size: var(--font-body);
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  padding-right: var(--spacing-10);
+}
+
+.intro__paragraph--first {
+  grid-column: 3;
+  text-indent: var(--spacing-40);
+}
+
+.intro__paragraph--second {
+  grid-column: 4;
+}
+
+/* Static structure only -- the header becoming sticky/pinned as you
+   scroll through the image is scroll-linked motion (GSAP ScrollTrigger,
+   annotated on this node in Figma), built later in the animation phase,
+   not here. This is just its resting position: overlaid on top of the
+   image, centered, like the maquette shows before any scroll happens. */
+.narrative {
+  position: relative;
+  padding-inline: var(--spacing-10);
+}
+
+.narrative__background {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.narrative__header {
+  position: absolute;
+  top: 0;
+  left: var(--spacing-10);
+  right: var(--spacing-10);
+  padding: var(--spacing-10);
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  color: var(--white);
+  font-size: var(--font-body);
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  /* Keeps the white text readable over both the image's light and dark
+     areas -- inverts whatever's underneath instead of relying on a
+     fixed contrast color. */
+  mix-blend-mode: exclusion;
+}
+
+.narrative__index-label {
+  grid-column: 1;
+}
+
+.narrative__title {
+  grid-column: 2;
+}
+
+.narrative__description {
+  grid-column: 3;
+  text-indent: var(--spacing-40);
+}
+
+.documentary {
+  position: relative;
+  padding: var(--spacing-320) var(--spacing-10);
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  row-gap: var(--spacing-24);
+}
+
+/* Placed as a grid item (col 2, pushed to its right edge with padding)
+   rather than absolute-positioned percentages -- same "padding inside
+   the cell, never a gap" pattern as the rest of the site, and it avoids
+   absolute positioning ignoring .documentary's own padding. */
+.documentary__index-label {
+  grid-column: 2;
+  grid-row: 1;
+  justify-self: end;
+  padding-right: var(--spacing-10);
+  color: var(--gray-text);
+  font-size: var(--font-body);
+  letter-spacing: -0.02em;
+}
+
+.documentary__image {
+  width: 100%;
+  object-fit: cover;
+}
+
+.documentary__image--cover {
+  grid-column: 1;
+  grid-row: 1;
+  aspect-ratio: 3 / 4;
+}
+
+.documentary__note {
+  grid-column: 3;
+  grid-row: 1;
+  font-size: var(--font-body);
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+}
+
+.documentary__caption {
+  grid-column: 6;
+  grid-row: 1;
+  justify-self: end;
+  font-size: var(--font-body);
+  letter-spacing: -0.02em;
+}
+
+.documentary__quote {
+  grid-column: 3 / span 2;
+  grid-row: 2;
+  padding-right: var(--spacing-10);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-24);
+}
+
+.documentary__quote-text {
+  font-size: var(--font-body);
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  text-indent: var(--spacing-40);
+}
+
+.documentary__quote-link {
+  font-size: var(--font-body);
+  letter-spacing: -0.02em;
+  color: var(--black);
+  text-decoration: underline;
+}
+
+.documentary__image--feature {
+  grid-column: 5 / span 2;
+  grid-row: 2;
+  aspect-ratio: 3 / 4;
+}
+
+/* Static structure only -- see the JSX comment above this section.
+   Positions/spans here are NON-NEGOTIABLE per the Figma annotation (they
+   ARE the grid the timeline targets); scale/opacity/the pin itself are
+   not set here, that's the GSAP phase. Reuses the site's existing
+   .grid-overlay (already position:fixed, so it stays correctly aligned
+   through the pin) -- no separate grid needed for this section. */
+.pin-gallery {
+  padding-inline: var(--spacing-10);
+}
+
+.pin-gallery__stage {
+  position: relative;
+  aspect-ratio: 1492 / 982;
+  overflow: hidden;
+  /* Centers .pin-gallery__lead -- doesn't affect .pin-gallery__images or
+     .pin-gallery__questions, both position:absolute and unaffected by
+     the parent's display type. */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pin-gallery__lead {
+  max-width: 32.94vw; /* 498px / 1512px reference width, wraps the text like the maquette */
+  font-weight: 400;
+  font-size: 2.1164vw; /* 32px / 1512px reference width */
+  line-height: 2.3148vw; /* 35px / 1512px reference width */
+  letter-spacing: -0.03em;
+  text-align: center;
+  color: var(--black);
+}
+
+.pin-gallery__images {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  grid-template-rows: 1fr;
+}
+
+.pin-gallery__image {
+  grid-row: 1;
+  align-self: center;
+  width: 100%;
+  aspect-ratio: 3 / 4;
+  object-fit: cover;
+}
+
+/* Grid placement only -- non-negotiable, per the Figma annotation.
+   No per-image crop/object-position yet: the photos here are
+   placeholders being swapped out, cropping happens once they're final. */
+.pin-gallery__image--1 {
+  grid-column: 4 / span 2;
+}
+
+.pin-gallery__image--2 {
+  grid-column: 10 / span 2;
+}
+
+.pin-gallery__image--3 {
+  grid-column: 2 / span 2;
+}
+
+.pin-gallery__image--4 {
+  grid-column: 6 / span 2;
+}
+
+.pin-gallery__questions {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  transform: translateY(-50%);
+  display: flex;
+  justify-content: space-between;
+  padding-inline: var(--spacing-24);
+  color: var(--white);
+}
+
+.pin-gallery__question {
+  font-size: var(--font-body);
+  letter-spacing: -0.02em;
+}
+
+/* No separate footer grid -- reuses the site's existing .grid-overlay
+   (position:fixed, z-index:1, always covers the whole viewport
+   already), instead of rebuilding the same decorative grid a second
+   time for this one section, like the maquette's own component does.
+   .site-footer itself deliberately stays OUT of the shared above-grid
+   rule (unlike .site-footer__legacy/__wordmark-clip below): its opaque
+   white background is a section background, same as .hero's, and stays
+   below the grid on purpose. */
+.site-footer {
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-160);
+  padding: var(--spacing-16) var(--spacing-10);
+  background: var(--white);
+}
+
+/* z-index:1 lifts the footer's own text back above .grid-overlay --
+   without it, this content would inherit .site-footer's stack level
+   (auto) and render under the grid along with the background. */
+.site-footer__legacy {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-size: var(--font-body);
+  letter-spacing: -0.02em;
+}
+
+.site-footer__legacy a {
+  text-decoration: none;
+}
+
+/* Same Capsize leading-trim technique as .hero__title-clip/.hero__title
+   -- this wordmark reuses that exact type size (--font-hero-title) and
+   letter-spacing, not a new one-off value. */
+.site-footer__wordmark-clip {
+  position: relative;
+  z-index: 1;
+  display: block;
+  overflow: hidden;
+  padding-block: calc(var(--font-hero-title) * 0.015);
+}
+
+.site-footer__wordmark {
+  font-size: var(--font-hero-title);
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: -0.05em;
+}
+
+.site-footer__wordmark::before,
+.site-footer__wordmark::after {
+  content: "";
+  display: table;
+}
+
+.site-footer__wordmark::before {
+  margin-bottom: -0.145em;
+}
+
+.site-footer__wordmark::after {
   margin-top: -0.145em;
 }
