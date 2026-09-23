@@ -12,69 +12,37 @@
      qui rétrécit en continu. Chaque valeur ci-dessous est identique aux
      3 paliers -- seul l'élément qui la CONSOMME change de token via un
      @media (ex: hero passe de --spacing-240 à --spacing-96 sous le
-     seuil mobile). Au-delà de 1512px, une zone séparée ("poster
-     scaling", décidée à part) fait grandir ces valeurs en continu
-     jusqu'à un plafond à 1920px -- ce n'est PAS la même chose que ce
-     système d'échelle fixe. Exception : --font-hero-title reste en vw,
-     sans plafond, y compris au-delà de 1920px -- décision explicite de
-     l'utilisateur, ce titre doit toujours occuper toute la largeur du
-     Hero, à l'infini (voir la mémoire du projet). */
-  --spacing-4-base: 4px;
-  --spacing-10-base: 10px;
-  --spacing-14-base: 14px;
-  --spacing-16-base: 16px;
-  --spacing-24-base: 24px;
-  --spacing-40-base: 40px;
-  --spacing-72-base: 72px;
-  --spacing-96-base: 96px;
-  --spacing-160-base: 160px;
-  --spacing-240-base: 240px;
-  --spacing-320-base: 320px;
-  --font-body-base: 14px;
+     seuil mobile). Ces valeurs restent fixes au-delà de 1512px aussi --
+     pas d'agrandissement continu (testé contre Firefox, qui ne supporte
+     pas la division vw/px dans calc() : la formule tombait à 0 dans ce
+     navigateur). --font-hero-title reste en vw sans plafond : décision
+     séparée, ce titre doit toujours occuper toute la largeur du Hero, à
+     l'infini (voir la mémoire du projet). */
+  --spacing-4: 4px;
+  --spacing-10: 10px;
+  --spacing-14: 14px;
+  --spacing-16: 16px;
+  --spacing-24: 24px;
+  --spacing-40: 40px;
+  --spacing-72: 72px;
+  --spacing-96: 96px;
+  --spacing-120: 120px;
+  --spacing-160: 160px;
+  --spacing-240: 240px;
+  --spacing-320: 320px;
 
-  --spacing-4: var(--spacing-4-base);
-  --spacing-10: var(--spacing-10-base);
-  --spacing-14: var(--spacing-14-base);
-  --spacing-16: var(--spacing-16-base);
-  --spacing-24: var(--spacing-24-base);
-  --spacing-40: var(--spacing-40-base);
-  --spacing-72: var(--spacing-72-base);
-  --spacing-96: var(--spacing-96-base);
-  --spacing-160: var(--spacing-160-base);
-  --spacing-240: var(--spacing-240-base);
-  --spacing-320: var(--spacing-320-base);
-  --font-body: var(--font-body-base);
+  /* Fluid typography, technique standard 2026 (rem de base + terme en
+     vw, additionnés -- jamais de division comme dans l'ancienne formule
+     qui cassait Firefox). Reste fixe à 14px en dessous de 1512px (le
+     `clamp()` plafonne tout seul en bas, pas besoin de @media séparé),
+     grandit progressivement jusqu'à 18px à 1920px, puis re-plafonne.
+     rem plutôt que px : respecte le zoom navigateur (accessibilité,
+     WCAG 1.4.4). */
+  --font-body: clamp(0.875rem, -0.0515rem + 0.9804vw, 1.125rem);
 
   --font-hero-title: 17.65vw;
 
   color-scheme: light;
-}
-
-/* Poster scaling: past the 1512px desktop reference width, every token
-   above grows proportionally with the viewport (like scaling a poster),
-   capped once the viewport reaches 1920px (a Full HD reference width --
-   picked so the grid/spacing keeps its "close to the edges" feel without
-   stretching unbounded on 4K/ultrawide screens, unlike the earlier
-   portfolio-2027 bug this is deliberately avoiding). Each token
-   references its own never-overridden -base value, not itself, to avoid
-   a cyclic custom-property reference. --font-hero-title is the one
-   deliberate exception -- it already scales via vw with no clamp here,
-   so it keeps growing past 1920px too, on purpose. */
-@media (min-width: 1512px) {
-  :root {
-    --spacing-4: clamp(var(--spacing-4-base), calc(var(--spacing-4-base) * (100vw / 1512px)), calc(var(--spacing-4-base) * 1920 / 1512));
-    --spacing-10: clamp(var(--spacing-10-base), calc(var(--spacing-10-base) * (100vw / 1512px)), calc(var(--spacing-10-base) * 1920 / 1512));
-    --spacing-14: clamp(var(--spacing-14-base), calc(var(--spacing-14-base) * (100vw / 1512px)), calc(var(--spacing-14-base) * 1920 / 1512));
-    --spacing-16: clamp(var(--spacing-16-base), calc(var(--spacing-16-base) * (100vw / 1512px)), calc(var(--spacing-16-base) * 1920 / 1512));
-    --spacing-24: clamp(var(--spacing-24-base), calc(var(--spacing-24-base) * (100vw / 1512px)), calc(var(--spacing-24-base) * 1920 / 1512));
-    --spacing-40: clamp(var(--spacing-40-base), calc(var(--spacing-40-base) * (100vw / 1512px)), calc(var(--spacing-40-base) * 1920 / 1512));
-    --spacing-72: clamp(var(--spacing-72-base), calc(var(--spacing-72-base) * (100vw / 1512px)), calc(var(--spacing-72-base) * 1920 / 1512));
-    --spacing-96: clamp(var(--spacing-96-base), calc(var(--spacing-96-base) * (100vw / 1512px)), calc(var(--spacing-96-base) * 1920 / 1512));
-    --spacing-160: clamp(var(--spacing-160-base), calc(var(--spacing-160-base) * (100vw / 1512px)), calc(var(--spacing-160-base) * 1920 / 1512));
-    --spacing-240: clamp(var(--spacing-240-base), calc(var(--spacing-240-base) * (100vw / 1512px)), calc(var(--spacing-240-base) * 1920 / 1512));
-    --spacing-320: clamp(var(--spacing-320-base), calc(var(--spacing-320-base) * (100vw / 1512px)), calc(var(--spacing-320-base) * 1920 / 1512));
-    --font-body: clamp(var(--font-body-base), calc(var(--font-body-base) * (100vw / 1512px)), calc(var(--font-body-base) * 1920 / 1512));
-  }
 }
 
 * {

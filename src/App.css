@@ -111,13 +111,50 @@
   width: 100%;
 }
 
+/* Spans the FULL row (grid-column:1/-1) instead of a single track, so
+   the percentage width below resolves against the whole row's width,
+   not just one narrow column -- a percentage on an item placed in a
+   single grid track resolves against that track, not the row.
+   margin-left:50% then positions it at the row's exact midpoint
+   (same spot as the old grid-column:3 start). Width is 25% (its real
+   grid-column share, matching Figma exactly at 1512px) down to a floor
+   of 266.25px -- the same width Figma uses for this same paragraph at
+   mobile, so it's a value already proven readable, not a guess. Above
+   that floor the box is always exactly 1/4 of the row (same rule for
+   desktop AND tablet, no breakpoint jump); below it, it stops shrinking
+   so the text never gets too cramped as the window narrows. */
 .hero__tagline {
-  grid-column: 3;
+  grid-column: 1 / -1;
   grid-row: 1;
+  margin-left: 50%;
+  width: clamp(266.25px, 25%, 373px);
   text-indent: var(--spacing-40);
   font-size: var(--font-body);
   line-height: 1.15;
   letter-spacing: -0.02em;
+}
+
+/* Real Figma width at this breakpoint doesn't match the clamp() above,
+   so it was falling back to its floor value instead. Set directly. */
+@media (max-width: 1023.98px) {
+  .hero__tagline {
+    width: 37.5%;
+  }
+}
+
+/* Mobile's real start point is the row's 25% mark, not 50%, and its
+   width is a flat 3/4 of the row (no floor needed -- 75% already
+   matches Figma's own mobile value exactly: 355px content width * 75%
+   = 266.25px). */
+@media (max-width: 767.98px) {
+  .hero {
+    padding-top: var(--spacing-96);
+  }
+
+  .hero__tagline {
+    margin-left: 25%;
+    width: 75%;
+  }
 }
 
 /* Capsize-style leading-trim wrapper: overflow:hidden clips the negative
@@ -254,6 +291,126 @@
   grid-row: 1;
 }
 
+/* Tablet (373:586): identical layout to desktop, verified via
+   get_design_context -- only the column COUNT drops (12 -> 8, matching
+   the homepage's site-wide 3:1 visible-to-logical column merge at this
+   breakpoint). Image spans (1/span 4, 5/span 2) are left untouched on
+   purpose: on an 8-column grid they land on the exact same real pixel
+   positions Figma shows (390px/185px), no separate override needed.
+   Bottom padding steps down 320 -> 240, matching the discrete scale. */
+@media (max-width: 1023.98px) {
+  .intro {
+    padding-bottom: var(--spacing-240);
+  }
+
+  .intro__media {
+    grid-template-columns: repeat(8, 1fr);
+  }
+
+  /* Real Figma pixels (373:592): both paragraphs sit at the SAME x
+     (390, columns 3-4 combined) but different y (0 and 88, a clean
+     24px gap after each 64px-tall paragraph) -- stacked, not
+     side-by-side like desktop's col-3/col-4 split. */
+  .intro__text {
+    row-gap: var(--spacing-24);
+  }
+
+  .intro__paragraph--first {
+    grid-column: 3 / span 2;
+    grid-row: 1;
+  }
+
+  .intro__paragraph--second {
+    grid-column: 3 / span 2;
+    grid-row: 2;
+  }
+}
+
+/* Mobile (489:1393): the two images stop sharing a row entirely --
+   primary goes full-width, secondary becomes half-width and
+   right-aligned underneath it (verified: 177.5px = exactly half of
+   355px). Grid swaps for flex; the 10px "padding not gap" convention
+   still applies. Bottom padding steps down again, 240 -> 160. */
+@media (max-width: 767.98px) {
+  .intro {
+    padding-bottom: var(--spacing-160);
+    /* Desktop/tablet's 24px gap between .intro__media and .intro__text
+       never got reset here -- real Figma mobile (489:1393/489:1399) gap
+       is 10px, matching .intro__media's own internal gap. */
+    gap: var(--spacing-10);
+  }
+
+  .intro__media {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: var(--spacing-10);
+  }
+
+  .intro__image--primary {
+    width: 100%;
+  }
+
+  .intro__image--secondary {
+    width: 50%;
+    padding-left: 0;
+  }
+
+  /* Desktop overlays this on top of the primary image (position:
+     absolute), but real Figma mobile (489:1393) shows it on its OWN row
+     ABOVE the image instead (16px tall + a 10px gap = the primary
+     image's real y:26 offset). It's last in the JSX, so order:-1 moves
+     it first in the flex flow; align-items:flex-end (already set on the
+     container) right-aligns it, matching Figma exactly. */
+  .intro__copyright {
+    position: static;
+    order: -1;
+  }
+
+  /* Desktop/tablet keep this absolute (positioned off to the side,
+     never overlapping the paragraph columns). On mobile the paragraphs
+     now span the FULL row, so absolute+left:0 would sit the label right
+     on top of paragraph 1 instead of above it. Real Figma (489:1399)
+     stacks all three (label, paragraph 1, paragraph 2) vertically with a
+     10px gap after the label -- so it becomes a normal grid row here
+     instead, matching that stack. */
+  .intro__text {
+    row-gap: var(--spacing-10);
+  }
+
+  .intro__index-label {
+    position: static;
+    grid-column: 1 / -1;
+    grid-row: 1;
+  }
+
+  /* No mobile override existed at all before -- the paragraphs were
+     silently inheriting desktop's narrow single-column spans (grid-
+     column:3/4 on a 4-col grid), wrapping the text into a tiny ~89px
+     column instead of the real Figma width. Real mobile data (489:1399):
+     both paragraphs are full-width (355px). Row-gap is 10px (matching
+     the label's own gap above); paragraph 2 needs an extra 14px margin
+     on top of that (10+14=24) to reach its real 24px gap after paragraph
+     1 -- same "base gap + one extra margin" technique already used for
+     .documentary__quote. */
+  /* Leftover from when both paragraphs shared a row (tablet layout) --
+     at full mobile width there's no gutter left to reserve. */
+  .intro__paragraph {
+    padding-right: 0;
+  }
+
+  .intro__paragraph--first {
+    grid-column: 1 / -1;
+    grid-row: 2;
+  }
+
+  .intro__paragraph--second {
+    grid-column: 1 / -1;
+    grid-row: 3;
+    margin-top: var(--spacing-14);
+  }
+}
+
 /* Static structure only -- the header becoming sticky/pinned as you
    scroll through the image is scroll-linked motion (GSAP ScrollTrigger,
    annotated on this node in Figma), built later in the animation phase,
@@ -291,6 +448,7 @@
 .narrative__index-label {
   grid-column: 1;
   grid-row: 1;
+  color: var(--gray-text);
 }
 
 .narrative__title {
@@ -302,6 +460,64 @@
   grid-column: 3;
   grid-row: 1;
   text-indent: var(--spacing-40);
+}
+
+/* Tablet (373:598), verified via get_design_context: same overlay
+   structure as desktop, but .narrative__title is hidden (annotated
+   "Changement responsive" in Figma) -- kept in the DOM per the site's
+   own convention (content stays, CSS-only hides it), so the
+   description simply spans the two now-empty columns instead. The
+   sticky-on-scroll behavior annotated here is GSAP ScrollTrigger.pin
+   work for the animation phase, not built here -- this stays a static
+   resting-position overlay, same as desktop. */
+@media (max-width: 1023.98px) {
+  .narrative__title {
+    display: none;
+  }
+
+  .narrative__description {
+    grid-column: 2 / span 2;
+  }
+}
+
+/* Mobile (489:1403): a real restructure, not just a smaller overlay --
+   the header moves BELOW the image as a normal stacked block instead of
+   floating on top of it, so the text goes back to plain black (the
+   white + mix-blend-mode:exclusion trick only exists to stay readable
+   over the image). The image itself switches from natural height to a
+   fixed crop (aspect-ratio 2731/4096, object-fit:cover), confirmed via
+   Figma -- a deliberate difference from desktop's height:auto, not an
+   oversight. */
+@media (max-width: 767.98px) {
+  .narrative {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-10);
+  }
+
+  .narrative__background {
+    aspect-ratio: 2731 / 4096;
+    object-fit: cover;
+  }
+
+  .narrative__header {
+    position: static;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--spacing-10);
+    padding: 0;
+    color: var(--black);
+    mix-blend-mode: normal;
+  }
+
+  /* Same missing-width bug as .documentary__note and the intro
+     paragraphs: .narrative__header switched to flex with no stretch, so
+     without an explicit width this shrinks to its content instead of
+     wrapping at the real Figma width (355px). */
+  .narrative__description {
+    width: 100%;
+  }
 }
 
 .documentary {
@@ -323,6 +539,7 @@
   padding-right: var(--spacing-10);
   color: var(--gray-text);
   font-size: var(--font-body);
+  line-height: 1.15;
   letter-spacing: -0.02em;
 }
 
@@ -384,6 +601,104 @@
   aspect-ratio: 3 / 4;
 }
 
+/* Tablet (373:604), verified via get_design_context: switches to its
+   own 12-column grid -- NOT a doubled version of desktop's 6 columns,
+   the proportions genuinely differ (confirmed already in a prior
+   session's audit). --spacing-24 row-gap and --spacing-10 side padding
+   are unchanged; only the block padding (320 -> 240) and every column
+   span change. .documentary__index-label is exported as a raw absolute
+   position in Figma, annotated "if you have a better option, do it" --
+   translated to a grid placement instead, same as desktop's own
+   deliberate choice, rather than copied as literal px. */
+@media (max-width: 1023.98px) {
+  .documentary {
+    grid-template-columns: repeat(12, 1fr);
+    padding-block: var(--spacing-240);
+  }
+
+  .documentary__index-label {
+    grid-column: 3;
+    grid-row: 1;
+    justify-self: end;
+    padding-right: var(--spacing-10);
+  }
+
+  .documentary__image--cover {
+    grid-column: 1 / span 2;
+  }
+
+  .documentary__note {
+    grid-column: 4 / span 4;
+  }
+
+  .documentary__caption {
+    grid-column: 10 / span 3;
+  }
+
+  .documentary__quote {
+    grid-column: 4 / span 6;
+  }
+
+  .documentary__image--feature {
+    grid-column: 10 / span 3;
+  }
+}
+
+/* Mobile (489:1408): the grid disappears entirely -- Figma exports
+   plain absolute positions here, so this is translated to a flex
+   column with `order`, same technique as Archive's mobile build.
+   Reading order (top to bottom by real Figma y-position): caption,
+   cover image, feature image, index-label, note, quote -- matches the
+   mobile reading order already confirmed in an earlier audit session.
+   Gaps between consecutive elements measure a clean 10px throughout,
+   except before the quote block (24px) -- expressed as the base 10px
+   gap plus an extra 14px margin on the quote itself, both real scale
+   tokens, rather than a one-off value. Top padding matches --spacing-160
+   exactly; bottom trailing space measures 145px in the source frame,
+   rounded to the same --spacing-160 token rather than adding a one-off
+   step to the scale. */
+@media (max-width: 767.98px) {
+  .documentary {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--spacing-10);
+    padding-block: var(--spacing-160);
+  }
+
+  .documentary__caption {
+    order: 1;
+    text-align: left;
+  }
+
+  .documentary__image--cover {
+    order: 2;
+    width: 50%;
+  }
+
+  .documentary__image--feature {
+    order: 3;
+    width: 100%;
+  }
+
+  .documentary__index-label {
+    order: 4;
+    padding-right: 0;
+  }
+
+  .documentary__note {
+    order: 5;
+    width: 100%;
+  }
+
+  .documentary__quote {
+    order: 6;
+    width: 100%;
+    padding-right: 0;
+    margin-top: var(--spacing-14);
+  }
+}
+
 /* Static structure only -- see the JSX comment above this section.
    Positions/spans here are NON-NEGOTIABLE per the Figma annotation (they
    ARE the grid the timeline targets); scale/opacity/the pin itself are
@@ -396,7 +711,7 @@
 
 .pin-gallery__stage {
   position: relative;
-  aspect-ratio: 1492 / 982;
+  height: 100vh;
   overflow: hidden;
   /* Centers .pin-gallery__lead -- doesn't affect .pin-gallery__images or
      .pin-gallery__questions, both position:absolute and unaffected by
@@ -406,11 +721,16 @@
   justify-content: center;
 }
 
+/* max-width reste fixe (498px, comme les marges du site) -- seule la
+   typo grandit. Même technique fluide que --font-body dans index.css :
+   rem de base + vw, pas de division, plafonne toute seule en dessous de
+   1512px et au-dessus de 1920px, sans @media. 32px -> 40px / 35px -> 44px
+   à 1920px (même rythme de croissance que le reste du texte du site). */
 .pin-gallery__lead {
-  max-width: 32.94vw; /* 498px / 1512px reference width, wraps the text like the maquette */
+  max-width: 498px;
   font-weight: 400;
-  font-size: 2.1164vw; /* 32px / 1512px reference width */
-  line-height: 2.3148vw; /* 35px / 1512px reference width */
+  font-size: clamp(2rem, 0.147rem + 1.9608vw, 2.5rem);
+  line-height: clamp(2.1875rem, 0.103rem + 2.2059vw, 2.75rem);
   letter-spacing: -0.03em;
   text-align: center;
   color: var(--black);
@@ -467,6 +787,88 @@
   font-size: var(--font-body);
   line-height: 1.15;
   letter-spacing: -0.02em;
+}
+
+/* Tablet (373:618): the stage itself needs no override -- it already
+   fills exactly one screen height at every breakpoint (see above), not
+   a shape copied from Figma. Only the 12-logical-column grid narrows to
+   8, and the lead paragraph swaps to its own discrete text style rather
+   than scaling desktop's. .pin-gallery__questions needs no override --
+   its real Figma numbers (padding-inline 24, space-between) already
+   hold unchanged at this width. */
+@media (max-width: 1023.98px) {
+  .pin-gallery__images {
+    grid-template-columns: repeat(8, 1fr);
+  }
+
+  .pin-gallery__image--1 {
+    grid-column: 3 / span 2;
+  }
+
+  .pin-gallery__image--2 {
+    grid-column: 6 / span 2;
+  }
+
+  .pin-gallery__image--3 {
+    grid-column: 2 / span 2;
+  }
+
+  .pin-gallery__image--4 {
+    grid-column: 4 / span 2;
+  }
+
+  .pin-gallery__lead {
+    max-width: 498px;
+    font-size: 28px;
+    line-height: 31px;
+    letter-spacing: -0.025em;
+  }
+}
+
+/* Mobile (489:1422): the 8-column grid narrows once more, to 4. Images
+   3 and 4 deliberately land on the SAME columns as images 1 and 2 --
+   confirmed against the real Figma coordinates, not a copy-paste slip --
+   since only one image is ever visible at a time once the timeline
+   runs. .pin-gallery__questions also stops being a left/right row here:
+   real Figma stacks the two questions centered, directly on top of each
+   other with no gap between them. */
+@media (max-width: 767.98px) {
+  .pin-gallery__images {
+    grid-template-columns: repeat(4, 1fr);
+  }
+
+  .pin-gallery__image--1 {
+    grid-column: 1 / span 2;
+  }
+
+  .pin-gallery__image--2 {
+    grid-column: 3 / span 2;
+  }
+
+  .pin-gallery__image--3 {
+    grid-column: 1 / span 2;
+  }
+
+  .pin-gallery__image--4 {
+    grid-column: 2 / span 2;
+  }
+
+  .pin-gallery__lead {
+    max-width: 335px;
+    font-size: 24px;
+    line-height: 27px;
+    letter-spacing: -0.02em;
+  }
+
+  .pin-gallery__questions {
+    left: 50%;
+    right: auto;
+    transform: translate(-50%, -50%);
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding-inline: 0;
+  }
 }
 
 /* No separate footer grid -- reuses the site's existing .grid-overlay
@@ -536,4 +938,25 @@
 
 .site-footer__wordmark::after {
   margin-top: -0.145em;
+}
+
+/* Tablet (559:505): only the gap between the legacy block and the
+   wordmark shrinks (160 -> 120, real Figma value). Top/bottom padding
+   stays 16px like desktop -- Figma's own tablet value is 24px here, but
+   the user tried 16px everywhere and confirmed he prefers it, so no
+   override is written for it (desktop's base 16px already carries
+   through unchanged). */
+@media (max-width: 1023.98px) {
+  .site-footer {
+    gap: var(--spacing-120);
+  }
+}
+
+/* Mobile (559:582): gap shrinks again (120 -> 96, real Figma value).
+   Padding-block already matches Figma's real mobile value (16px) via
+   the shared desktop rule -- no override needed. */
+@media (max-width: 767.98px) {
+  .site-footer {
+    gap: var(--spacing-96);
+  }
 }
