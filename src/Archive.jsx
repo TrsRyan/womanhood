@@ -397,7 +397,7 @@ function Archive() {
         </div>
 
         <span className="site-footer__wordmark-clip">
-          <p className="site-footer__wordmark">WoManHood</p>
+          <span className="sr-only">WoManHood</span>
         </span>
       </footer>
     </>

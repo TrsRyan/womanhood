@@ -15,9 +15,7 @@
      seuil mobile). Ces valeurs restent fixes au-delà de 1512px aussi --
      pas d'agrandissement continu (testé contre Firefox, qui ne supporte
      pas la division vw/px dans calc() : la formule tombait à 0 dans ce
-     navigateur). --font-hero-title reste en vw sans plafond : décision
-     séparée, ce titre doit toujours occuper toute la largeur du Hero, à
-     l'infini (voir la mémoire du projet). */
+     navigateur). */
   --spacing-4: 4px;
   --spacing-10: 10px;
   --spacing-14: 14px;
@@ -39,8 +37,6 @@
      rem plutôt que px : respecte le zoom navigateur (accessibilité,
      WCAG 1.4.4). */
   --font-body: clamp(0.875rem, -0.0515rem + 0.9804vw, 1.125rem);
-
-  --font-hero-title: 17.65vw;
 
   color-scheme: light;
 }
@@ -83,4 +79,18 @@ button {
 
 a {
   color: inherit;
+}
+
+/* Standard visually-hidden pattern: present for screen readers, invisible
+   and zero-footprint for everyone else. */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
 }
