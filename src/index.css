@@ -2,20 +2,16 @@
 
 :root {
   --black: #181818;
+  --black-pure: #000000;
   --gray-text: #bcbcbc;
   --white: #ffffff;
   --grid-line: rgba(0, 0, 0, 0.08);
 
-  /* Échelle d'espacement Figma : une échelle FIXE de tailles nommées
-     (confirmé via get_variable_defs/get_design_context, comparé sur les
-     3 largeurs de référence desktop/tablette/mobile), pas un système
-     qui rétrécit en continu. Chaque valeur ci-dessous est identique aux
-     3 paliers -- seul l'élément qui la CONSOMME change de token via un
-     @media (ex: hero passe de --spacing-240 à --spacing-96 sous le
-     seuil mobile). Ces valeurs restent fixes au-delà de 1512px aussi --
-     pas d'agrandissement continu (testé contre Firefox, qui ne supporte
-     pas la division vw/px dans calc() : la formule tombait à 0 dans ce
-     navigateur). */
+  /* A fixed scale of named sizes, identical at every breakpoint and above
+     1512px: a breakpoint changes which token an element uses (e.g. .hero
+     steps from --spacing-240 to --spacing-96 on mobile), never the token
+     itself. Deliberately not fluid: dividing a vw length by a px length
+     in calc() is invalid in Firefox. */
   --spacing-4: 4px;
   --spacing-10: 10px;
   --spacing-14: 14px;
@@ -29,13 +25,10 @@
   --spacing-240: 240px;
   --spacing-320: 320px;
 
-  /* Fluid typography, technique standard 2026 (rem de base + terme en
-     vw, additionnés -- jamais de division comme dans l'ancienne formule
-     qui cassait Firefox). Reste fixe à 14px en dessous de 1512px (le
-     `clamp()` plafonne tout seul en bas, pas besoin de @media séparé),
-     grandit progressivement jusqu'à 18px à 1920px, puis re-plafonne.
-     rem plutôt que px : respecte le zoom navigateur (accessibilité,
-     WCAG 1.4.4). */
+  /* Fluid type: a rem base plus a vw term, added rather than divided.
+     Holds at 14px below 1512px, grows to 18px at 1920px, then holds
+     again -- clamp() handles both floors without a media query. rem
+     rather than px so browser zoom still applies (WCAG 1.4.4). */
   --font-body: clamp(0.875rem, -0.0515rem + 0.9804vw, 1.125rem);
 
   color-scheme: light;
@@ -43,6 +36,16 @@
 
 * {
   box-sizing: border-box;
+}
+
+/* Hides the scrollbar only; the page still scrolls by wheel, touch and
+   keyboard. The ::-webkit-scrollbar rule covers Safari before 18.2. */
+html {
+  scrollbar-width: none;
+}
+
+html::-webkit-scrollbar {
+  display: none;
 }
 
 body {

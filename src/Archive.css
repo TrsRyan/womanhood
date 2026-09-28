@@ -1,28 +1,14 @@
-/* 12-column grid on desktop, verified against the real Figma frame
-   (get_metadata on 313:2). NOT the same "3 visual lines = 1 logical
-   column" system the homepage uses for pin-gallery/intro -- Archive's
-   own columns line up cleanly with the 41.44px visual unit directly
-   (1:1), confirmed by measurement, not assumed from the homepage's
-   pattern (see the tablet override below, where this really matters:
-   Archive stays unmerged there too, unlike the homepage). Column spans
-   below are all verified this same way, not eyeballed.
-   padding-top clears .site-header (position:fixed, 36px tall) -- same
-   deliberate deviation from Figma's own measurement (320) as .hero on
-   the homepage, using --spacing-240 instead, for consistency across
-   pages. padding-bottom is breathing room before .site-footer, same
-   token/role as .intro's own bottom padding before .narrative on the
-   homepage. */
+/* Unlike the homepage, Archive's columns map 1:1 onto the visible grid
+   lines (no 3-lines-per-column merge), at every breakpoint.
+   padding-top uses --spacing-240 rather than the mockup's 320, matching
+   .hero for consistency across pages; padding-bottom gives the footer
+   the same breathing room .intro gives .narrative. */
 .archive__container {
   display: grid;
   grid-template-columns: repeat(12, 1fr);
   padding: var(--spacing-240) var(--spacing-10) var(--spacing-320);
 }
 
-/* Static structure only -- both this and .archive__toc are annotated in
-   Figma to stay pinned on screen while only the article text scrolls
-   (GSAP ScrollTrigger.pin, NOT CSS position:sticky -- breaks under this
-   site's ScrollSmoother, same reasoning as .narrative's header). Not
-   built here, that's the animation phase. */
 .archive__credit {
   grid-column: 3 / span 2;
   grid-row: 1;
@@ -76,8 +62,6 @@
   color: var(--black);
 }
 
-/* Matches the real Figma frame exactly (4 of 12 columns, starting at
-   column 7) -- verified via get_metadata, not eyeballed. */
 .archive__content {
   grid-column: 7 / span 4;
   grid-row: 1;
@@ -107,8 +91,6 @@
   white-space: nowrap;
 }
 
-/* 96px between articles, verified against the real Figma frame
-   (article 2 starts exactly 96px below article 1 ends). */
 .archive__article-list {
   display: flex;
   flex-direction: column;
@@ -146,19 +128,9 @@
   text-indent: var(--spacing-40);
 }
 
-/* Tablet: verified via get_metadata on the real Figma tablet frame
-   (509:168), not derived from the desktop values. archive__container
-   does NOT use the homepage's "3 visual lines = 1 logical column"
-   merge ratio -- it uses the 24 visible columns directly, confirmed by
-   the fact that every position here only lands on a clean column
-   boundary with the unmerged (32.5px) unit, not the merged (97.5px)
-   one. Row 1 = credit + toc, row 2 = nav + content, gap between rows
-   verified as exactly --spacing-96 (384 - 240 - 48 = 96 in the raw
-   Figma coordinates). Top padding stays --spacing-240 per the same
-   deliberate desktop choice (pending a visual check per the user's own
-   call); bottom padding follows the same 320->240 step the rest of the
-   site uses at this breakpoint, since it was never a literal Figma
-   measurement to begin with (added for footer breathing room). */
+/* Tablet: the 24 visible columns are used directly. Two rows: credit +
+   toc, then nav + content. Bottom padding takes the same 320 -> 240 step
+   as the rest of the site at this breakpoint. */
 @media (max-width: 1023.98px) {
   .archive__container {
     grid-template-columns: repeat(24, 1fr);
@@ -170,10 +142,7 @@
     grid-column: 3 / span 6;
   }
 
-  /* Genuinely different from desktop, confirmed via get_design_context
-     on node 509:241 -- Figma switches this to items-start (left) on
-     tablet, not the same items-end (right) as desktop. Not a case of
-     "keep whatever desktop does" -- verified separately. */
+  /* Left-aligned on tablet, unlike desktop's right alignment. */
   .archive__toc,
   .archive__toc-links {
     align-items: flex-start;
@@ -194,31 +163,11 @@
   }
 }
 
-/* Mobile: the grid is dropped entirely here -- confirmed via
-   get_design_context on the real Figma mobile frame (node 581:3), not
-   assumed from the tablet pattern. Everything becomes one column,
-   stacked in DOM order (credit -> contacts -> nav -> content, already
-   the order the JSX uses -- see the DOM-reorder fix earlier this
-   session). Every value below (160, 72, 14, 24) is quoted directly
-   from that same get_design_context call, not estimated:
-   .archive__container: pt-160 px-10 (--spacing-240 does NOT carry
-   through to mobile -- confirmed by direct measurement, contradicts
-   the earlier assumption that it would stay unchanged). .archive__toc:
-   pt-24. .archive__nav: py-72. .archive__article-list: gap-72 pb-160
-   (not the 96 used at desktop/tablet). .archive__article: gap-14 (not
-   24). Sticky chapter titles are NOT built here -- Figma's own
-   `position:sticky` on .archive__article-header breaks under this
-   site's ScrollSmoother (same reasoning as .narrative__header),
-   annotated in Figma with the exact GSAP ScrollTrigger.pin technique
-   to use instead -- that's the animation phase, the user's own work. */
+/* Mobile: the grid is dropped for a single column stacked in DOM order
+   (credit, contacts, nav, content), with its own tighter spacing. */
 @media (max-width: 767.98px) {
-  /* gap:0 is required, not decorative -- the tablet query above also
-     matches every mobile width (both use max-width, so they overlap
-     instead of being mutually exclusive), and its row-gap:96 would
-     otherwise leak through uncancelled, adding a phantom 96px gap
-     between every stacked child here. Each breakpoint query must
-     explicitly reset anything a wider one set that shouldn't carry
-     down, not just the properties this breakpoint actively changes. */
+  /* The tablet query also matches here (max-width queries overlap), so
+     its row-gap must be reset explicitly. */
   .archive__container {
     display: flex;
     flex-direction: column;
