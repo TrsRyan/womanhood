@@ -6,7 +6,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: var(--spacing-10);
+  padding: var(--gutter);
   /* White + difference inverts against whatever scrolls underneath:
      black over light sections, white over dark images and the footer. */
   color: var(--white);
@@ -38,7 +38,7 @@
   inset: 0;
   z-index: 1;
   display: flex;
-  padding-inline: var(--spacing-10);
+  padding-inline: var(--gutter);
   pointer-events: none;
 }
 
@@ -54,13 +54,13 @@
 /* All 36 lines always render; the column count (36/24/12) switches by
    hiding the extra ones at the layout breakpoints, and flex:1 spreads
    the rest evenly. */
-@media (max-width: 1023.98px) {
+@media (width < 1024px) {
   .grid-overlay__line:nth-child(n + 25) {
     display: none;
   }
 }
 
-@media (max-width: 767.98px) {
+@media (width < 768px) {
   .grid-overlay__line:nth-child(n + 13) {
     display: none;
   }
@@ -90,12 +90,14 @@
   flex-direction: column;
   align-items: flex-start;
   justify-content: space-between;
-  height: 100vh;
-  padding: var(--spacing-240) var(--spacing-10) var(--spacing-16) var(--spacing-10);
+  /* svh: the height left with the mobile toolbar fully shown, as it is on
+     load, so the bottom row is never hidden behind it. */
+  height: 100svh;
+  padding: var(--spacing-240) var(--gutter) var(--spacing-16);
   background: var(--white);
   mask-image: linear-gradient(#000, #000), url('/wordmark-mask.svg');
-  mask-size: 100% 100%, calc(100% - 20px) auto;
-  mask-position: top left, 10px calc(100% - 16px);
+  mask-size: 100% 100%, calc(100% - var(--gutter) * 2) auto;
+  mask-position: top left, var(--gutter) calc(100% - var(--spacing-16));
   mask-repeat: no-repeat, no-repeat;
   mask-composite: exclude;
   -webkit-mask-composite: xor;
@@ -123,14 +125,14 @@
 }
 
 /* Tablet width is its own value, not the clamp() above. */
-@media (max-width: 1023.98px) {
+@media (width < 1024px) {
   .hero__tagline {
     width: 37.5%;
   }
 }
 
 /* Mobile: starts at the row's 25% mark and spans the remaining 3/4. */
-@media (max-width: 767.98px) {
+@media (width < 768px) {
   .hero {
     padding-top: var(--spacing-96);
   }
@@ -189,7 +191,7 @@
 }
 
 .intro {
-  padding: var(--spacing-10) var(--spacing-10) var(--spacing-320) var(--spacing-10);
+  padding: var(--spacing-10) var(--gutter) var(--spacing-320);
   display: flex;
   flex-direction: column;
   gap: var(--spacing-24);
@@ -219,7 +221,7 @@
 .intro__image--secondary {
   grid-column: 5 / span 2;
   grid-row: 1;
-  padding-left: var(--spacing-10);
+  padding-left: var(--gutter);
   /* Travels within its own grid area (as tall as the primary image,
      align-items:start leaves the room below it), so it releases exactly
      when its bottom meets the primary image's bottom. */
@@ -239,7 +241,6 @@
 /* Contiguous cells on a 4-column grid; spacing is padding inside each
    cell, never a gap. */
 .intro__text {
-  position: relative;
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   width: 100%;
@@ -248,7 +249,7 @@
 .intro__index-label {
   position: absolute;
   top: 0;
-  right: calc(50% + var(--spacing-10));
+  right: calc(50% + var(--gutter));
   color: var(--gray-text);
   font-size: var(--font-body);
   line-height: 1.15;
@@ -259,7 +260,7 @@
   font-size: var(--font-body);
   line-height: 1.15;
   letter-spacing: -0.02em;
-  padding-right: var(--spacing-10);
+  padding-right: var(--gutter);
 }
 
 .intro__paragraph--first {
@@ -277,7 +278,7 @@
    as they are on purpose, since they already land where the tablet
    layout needs them. The paragraphs stack instead of sitting side by
    side. */
-@media (max-width: 1023.98px) {
+@media (width < 1024px) {
   .intro {
     padding-bottom: var(--spacing-240);
   }
@@ -292,7 +293,6 @@
 
   .intro__paragraph--first {
     grid-column: 3 / span 2;
-    grid-row: 1;
   }
 
   .intro__paragraph--second {
@@ -303,17 +303,17 @@
 
 /* Mobile: the images stack, the primary full-width and the secondary
    half-width, right-aligned below it. */
-@media (max-width: 767.98px) {
+@media (width < 768px) {
   .intro {
     padding-bottom: var(--spacing-160);
-    gap: var(--spacing-10);
+    gap: var(--gutter);
   }
 
   .intro__media {
     display: flex;
     flex-direction: column;
     align-items: flex-end;
-    gap: var(--spacing-10);
+    gap: var(--gutter);
   }
 
   .intro__image--primary {
@@ -335,7 +335,7 @@
   /* The paragraphs span the full row here, so the label becomes a row of
      its own above them instead of sitting beside them. */
   .intro__text {
-    row-gap: var(--spacing-10);
+    row-gap: var(--gutter);
   }
 
   .intro__index-label {
@@ -344,8 +344,8 @@
     grid-row: 1;
   }
 
-  /* Full-width paragraphs need no gutter. The second one adds 14px to the
-     10px row-gap for a 24px gap, keeping both on the spacing scale. */
+  /* Full-width paragraphs need no gutter. The second one tops the row-gap
+     up to 24px, keeping the gap on the spacing scale. */
   .intro__paragraph {
     padding-right: 0;
   }
@@ -358,7 +358,7 @@
   .intro__paragraph--second {
     grid-column: 1 / -1;
     grid-row: 3;
-    margin-top: var(--spacing-14);
+    margin-top: calc(var(--spacing-24) - var(--gutter));
   }
 }
 
@@ -366,8 +366,7 @@
    overlay would, but the header stays in flow, which position:sticky
    needs (Lenis scrolls natively, so no GSAP pin required). */
 .narrative {
-  position: relative;
-  padding-inline: var(--spacing-10);
+  padding-inline: var(--gutter);
   display: grid;
 }
 
@@ -419,7 +418,7 @@
 
 /* Tablet: the title is hidden (kept in the DOM, CSS-only) and the
    description takes over its columns. */
-@media (max-width: 1023.98px) {
+@media (width < 1024px) {
   .narrative__title {
     display: none;
   }
@@ -429,18 +428,25 @@
   }
 }
 
-/* Mobile: the image is shorter than the screen, so there is nothing to
-   stick through -- the header covers the image and centers on it, label
-   and description stacked. */
-@media (max-width: 767.98px) {
+/* Mobile: the header leaves the image and follows it in the normal flow,
+   label and description stacked. Off the image, the text goes back to
+   plain black: the white + exclusion blend only exists to read over it. */
+@media (width < 768px) {
+  .narrative {
+    row-gap: var(--gutter);
+  }
+
   .narrative__header {
-    align-self: stretch;
+    grid-area: 2 / 1;
+    position: static;
     height: auto;
+    padding: 0;
     display: flex;
     flex-direction: column;
-    justify-content: center;
     align-items: flex-start;
-    gap: var(--spacing-10);
+    gap: var(--gutter);
+    color: var(--black);
+    mix-blend-mode: normal;
   }
 
   /* Flex items shrink to their content without an explicit width,
@@ -451,8 +457,7 @@
 }
 
 .documentary {
-  position: relative;
-  padding: var(--spacing-320) var(--spacing-10);
+  padding: var(--spacing-320) var(--gutter);
   display: grid;
   grid-template-columns: repeat(6, 1fr);
   row-gap: var(--spacing-24);
@@ -464,7 +469,7 @@
   grid-column: 2;
   grid-row: 1;
   justify-self: end;
-  padding-right: var(--spacing-10);
+  padding-right: var(--gutter);
   color: var(--gray-text);
   font-size: var(--font-body);
   line-height: 1.15;
@@ -502,7 +507,7 @@
 .documentary__quote {
   grid-column: 3 / span 2;
   grid-row: 2;
-  padding-right: var(--spacing-10);
+  padding-right: var(--gutter);
   display: flex;
   flex-direction: column;
   gap: var(--spacing-24);
@@ -531,7 +536,7 @@
 
 /* Tablet: its own 12-column grid with different proportions, not a
    doubled desktop grid. Only the block padding and the spans change. */
-@media (max-width: 1023.98px) {
+@media (width < 1024px) {
   .documentary {
     grid-template-columns: repeat(12, 1fr);
     padding-block: var(--spacing-240);
@@ -539,9 +544,6 @@
 
   .documentary__index-label {
     grid-column: 3;
-    grid-row: 1;
-    justify-self: end;
-    padding-right: var(--spacing-10);
   }
 
   .documentary__image--cover {
@@ -567,20 +569,19 @@
 
 /* Mobile: a single flex column whose `order` sets the mobile reading
    order (caption, cover, feature, label, note, quote) from the same
-   DOM. The quote's extra 14px on top of the 10px gap gives it 24px,
-   staying on the spacing scale. */
-@media (max-width: 767.98px) {
+   DOM. The quote's margin tops the gap up to 24px, staying on the
+   spacing scale. */
+@media (width < 768px) {
   .documentary {
     display: flex;
     flex-direction: column;
     align-items: flex-start;
-    gap: var(--spacing-10);
+    gap: var(--gutter);
     padding-block: var(--spacing-160);
   }
 
   .documentary__caption {
     order: 1;
-    text-align: left;
   }
 
   .documentary__image--cover {
@@ -607,7 +608,7 @@
     order: 6;
     width: 100%;
     padding-right: 0;
-    margin-top: var(--spacing-14);
+    margin-top: calc(var(--spacing-24) - var(--gutter));
   }
 }
 
@@ -616,13 +617,14 @@
    live in App.jsx. Reuses the site-wide .grid-overlay, which is
    position:fixed and so stays aligned through the pin.
    The stage is full-bleed so the last image can morph edge to edge; the
-   site's 10px side margins live on the images grid and the questions
+   site's side margins live on the images grid and the questions
    instead. */
 .pin-gallery__stage {
   position: relative;
-  /* svh: the height left with the mobile toolbar shown, so the pinned
-     stage never runs under it. */
-  height: 100svh;
+  /* lvh: the height with the mobile toolbar collapsed, as it is while
+     scrolling through the pin. It never changes as the toolbar moves,
+     and matches the 100vh ScrollTrigger measures positions against. */
+  height: 100lvh;
   overflow: hidden;
   /* Centers the lead; the images and questions are absolute, so it
      doesn't affect them. */
@@ -649,7 +651,7 @@
 .pin-gallery__images {
   position: absolute;
   inset: 0;
-  padding-inline: var(--spacing-10);
+  padding-inline: var(--gutter);
   display: grid;
   grid-template-columns: repeat(12, 1fr);
   grid-template-rows: 1fr;
@@ -691,7 +693,7 @@
    thing writing transforms on the questions. */
 .pin-gallery__questions {
   position: absolute;
-  inset: 0 var(--spacing-10);
+  inset: 0 var(--gutter);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -707,7 +709,7 @@
 
 /* Tablet: 8 columns, and the lead switches to its own fixed text style
    rather than scaling the desktop one. */
-@media (max-width: 1023.98px) {
+@media (width < 1024px) {
   .pin-gallery__images {
     grid-template-columns: repeat(8, 1fr);
   }
@@ -729,9 +731,8 @@
   }
 
   .pin-gallery__lead {
-    max-width: 498px;
-    font-size: 28px;
-    line-height: 31px;
+    font-size: 1.75rem;
+    line-height: 1.9375rem;
     letter-spacing: -0.025em;
   }
 }
@@ -739,7 +740,7 @@
 /* Mobile: 4 columns. Items 1 and 3 share their columns on purpose, since
    only one is ever visible at a time. The questions stack, centered, with
    no gap. */
-@media (max-width: 767.98px) {
+@media (width < 768px) {
   .pin-gallery__images {
     grid-template-columns: repeat(4, 1fr);
   }
@@ -762,8 +763,8 @@
 
   .pin-gallery__lead {
     max-width: 335px;
-    font-size: 24px;
-    line-height: 27px;
+    font-size: 1.5rem;
+    line-height: 1.6875rem;
     letter-spacing: -0.02em;
   }
 
@@ -784,11 +785,11 @@
   flex-direction: column;
   align-items: center;
   gap: var(--spacing-160);
-  padding: var(--spacing-16) var(--spacing-10);
+  padding: var(--spacing-16) var(--gutter);
   background: var(--white);
   mask-image: linear-gradient(#000, #000), url('/wordmark-mask.svg');
-  mask-size: 100% 100%, calc(100% - 20px) auto;
-  mask-position: top left, 10px calc(100% - 16px);
+  mask-size: 100% 100%, calc(100% - var(--gutter) * 2) auto;
+  mask-position: top left, var(--gutter) calc(100% - var(--spacing-16));
   mask-repeat: no-repeat, no-repeat;
   mask-composite: exclude;
   -webkit-mask-composite: xor;
@@ -814,13 +815,13 @@
   aspect-ratio: 1464 / 193;
 }
 
-@media (max-width: 1023.98px) {
+@media (width < 1024px) {
   .site-footer {
     gap: var(--spacing-120);
   }
 }
 
-@media (max-width: 767.98px) {
+@media (width < 768px) {
   .site-footer {
     gap: var(--spacing-96);
   }

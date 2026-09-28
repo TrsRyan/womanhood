@@ -26,8 +26,9 @@ const PIN_GALLERY_OVERLAP = 0.3
 // symmetric: an image grows and shrinks the same way in both directions.
 const PIN_GALLERY_EASE = 'power1.inOut'
 // Empty time after the last tween: the numeric scrub lags behind the
-// scroll, so the pin must outlast the animation or it releases mid-morph.
-const PIN_GALLERY_END_HOLD = 0.5
+// scroll, and the questions reveal on their own clock, so the pin must
+// outlast both or it releases mid-morph or mid-reveal.
+const PIN_GALLERY_END_HOLD = 1
 // How long each word of the lead takes to turn from gray to black.
 const PIN_GALLERY_WORD_FILL = 0.3
 
@@ -106,7 +107,7 @@ function App() {
     // The travel distance and Flip.fit are both measured in pixels, so the
     // timeline is rebuilt whenever the stage itself changes size (GSAP's
     // recommended fix for Flip + resize). Only the tweens are rebuilt,
-    // never the pin, so the page never jumps. The stage is 100svh, which
+    // never the pin, so the page never jumps. The stage is 100lvh, which
     // ignores the mobile browser toolbar, so toolbar show/hide never
     // triggers a rebuild mid-scroll.
     let measuredSize = ''
@@ -155,7 +156,7 @@ function App() {
         pinGalleryTimeline
           .fromTo(image, { y: travel }, { y: 0, ease: PIN_GALLERY_EASE, duration: settleDuration }, start)
           .add(
-            Flip.fit(lastItem, stage, { absolute: true, ease: PIN_GALLERY_EASE, duration: 2 }),
+            Flip.fit(lastItem, stage, { absolute: true, ease: PIN_GALLERY_EASE, duration: 2.5 }),
             start + settleDuration + PIN_GALLERY_HOLD,
           )
       })
@@ -326,8 +327,9 @@ function App() {
               grid-row 1 and overlap on purpose: the timeline shows one at a
               time. Each <img> owns its scroll-up and scale; its <figure>
               owns size/position (item 4 is resized by Flip), so the two
-              animations never write to the same element. .pin-gallery__questions stays
-              a sibling of the items, never nested in the one being resized. */}
+              animations never write to the same element.
+              .pin-gallery__questions stays a sibling of the items, never
+              nested in the one being resized. */}
           <section className="pin-gallery" ref={pinGalleryRef}>
             <div className="pin-gallery__stage" ref={pinGalleryStageRef}>
               <p className="pin-gallery__lead">

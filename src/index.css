@@ -14,6 +14,7 @@
      in calc() is invalid in Firefox. */
   --spacing-4: 4px;
   --spacing-10: 10px;
+  --spacing-12: 12px;
   --spacing-14: 14px;
   --spacing-16: 16px;
   --spacing-24: 24px;
@@ -31,7 +32,25 @@
      rather than px so browser zoom still applies (WCAG 1.4.4). */
   --font-body: clamp(0.875rem, -0.0515rem + 0.9804vw, 1.125rem);
 
+  /* The grid's side margin, reused as the space between neighbouring
+     blocks so edges and gaps always share one rhythm. */
+  --gutter: var(--spacing-10);
+
+  /* .site-header's rendered height: one line of body text plus its
+     padding. Lets content that slides under the header reserve room. */
+  --site-header-height: calc(var(--font-body) * 1.15 + var(--gutter) * 2);
+
   color-scheme: light;
+}
+
+/* Phones: one step up from the 14px type floor keeps long passages
+   readable, and a wider gutter keeps text off the screen edges, without
+   losing the small, editorial feel. */
+@media (width < 768px) {
+  :root {
+    --font-body: 0.9375rem;
+    --gutter: var(--spacing-12);
+  }
 }
 
 * {

@@ -6,7 +6,7 @@
 .archive__container {
   display: grid;
   grid-template-columns: repeat(12, 1fr);
-  padding: var(--spacing-240) var(--spacing-10) var(--spacing-320);
+  padding: var(--spacing-240) var(--gutter) var(--spacing-320);
 }
 
 .archive__credit {
@@ -131,11 +131,11 @@
 /* Tablet: the 24 visible columns are used directly. Two rows: credit +
    toc, then nav + content. Bottom padding takes the same 320 -> 240 step
    as the rest of the site at this breakpoint. */
-@media (max-width: 1023.98px) {
+@media (width < 1024px) {
   .archive__container {
     grid-template-columns: repeat(24, 1fr);
     row-gap: var(--spacing-96);
-    padding: var(--spacing-240) var(--spacing-10) var(--spacing-240);
+    padding: var(--spacing-240) var(--gutter) var(--spacing-240);
   }
 
   .archive__credit {
@@ -165,14 +165,14 @@
 
 /* Mobile: the grid is dropped for a single column stacked in DOM order
    (credit, contacts, nav, content), with its own tighter spacing. */
-@media (max-width: 767.98px) {
+@media (width < 768px) {
   /* The tablet query also matches here (max-width queries overlap), so
      its row-gap must be reset explicitly. */
   .archive__container {
     display: flex;
     flex-direction: column;
     gap: 0;
-    padding: var(--spacing-160) var(--spacing-10) 0;
+    padding: var(--spacing-160) var(--gutter) 0;
   }
 
   .archive__toc {
@@ -190,5 +190,26 @@
 
   .archive__article {
     gap: var(--spacing-14);
+  }
+
+  /* Each chapter title sticks to the top while its chapter is read, then
+     leaves with it. The opaque band extends up behind the fixed site
+     header (which stays above it) so text scrolling past never shows
+     between the two; the negative margin cancels that extra height so
+     the resting layout keeps the design's 10px band padding. No z-index:
+     like every other background, the band stays under the grid overlay. */
+  .archive__article-header {
+    position: sticky;
+    top: 0;
+    margin-top: calc(var(--spacing-10) - var(--site-header-height) - var(--spacing-14));
+    padding-top: calc(var(--site-header-height) + var(--spacing-14));
+    padding-bottom: var(--spacing-10);
+    background: var(--white);
+  }
+
+  /* Long passages on a narrow column need more air between lines than
+     the dense desktop setting. */
+  .archive__article-paragraph {
+    line-height: 1.2;
   }
 }
