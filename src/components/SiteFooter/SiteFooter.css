@@ -1,9 +1,17 @@
-/* Its white background stays below .grid-overlay like .hero's; only the
-   legacy text is lifted above it. The wordmark stays below too, so the
-   grid runs across its letters as it does across .hero's cutout. */
+/* Reveal footer: this in-flow box is a window onto the content, which is
+   fixed to the bottom of the viewport. clip-path limits the content, and
+   its pointer events, to the window, so the footer only shows as the page
+   scrolls off it, never through the transparent areas above. The whole
+   footer stays below .grid-overlay, like .hero. Height is set in
+   SiteFooter.jsx. */
 .site-footer {
-  position: relative;
-  overflow: hidden;
+  clip-path: inset(0);
+}
+
+.site-footer__content {
+  position: fixed;
+  inset-inline: 0;
+  bottom: 0;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -13,8 +21,6 @@
 }
 
 .site-footer__legacy {
-  position: relative;
-  z-index: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -45,14 +51,25 @@
   }
 }
 
+/* Black layer over the whole footer, faded out by scroll as the footer is
+   uncovered. Transparent by default so the footer stays readable without
+   the animation; clicks and hovers pass through to the letters. */
+.site-footer__shade {
+  position: absolute;
+  inset: 0;
+  background: var(--black);
+  opacity: 0;
+  pointer-events: none;
+}
+
 @media (width < 1024px) {
-  .site-footer {
+  .site-footer__content {
     gap: var(--spacing-120);
   }
 }
 
 @media (width < 768px) {
-  .site-footer {
+  .site-footer__content {
     gap: var(--spacing-96);
   }
 }
