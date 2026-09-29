@@ -1,8 +1,7 @@
 @import '@fontsource-variable/geist';
 
 :root {
-  --black: #181818;
-  --black-pure: #000000;
+  --black: #000000;
   --gray-text: #bcbcbc;
   --white: #ffffff;
   --grid-line: rgba(0, 0, 0, 0.08);

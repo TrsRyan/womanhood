@@ -86,7 +86,7 @@
   position: fixed;
   inset: 0;
   z-index: -2;
-  background: var(--black-pure);
+  background: var(--black);
 }
 
 /* Fixed for good (a sticky element would eventually release) and behind
