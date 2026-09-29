@@ -1,0 +1,36 @@
+/* One site-wide grid, fixed to the viewport. Kept a direct child of the
+   root: a transformed ancestor would break position:fixed. z-index:1
+   keeps it above section backgrounds, which would otherwise paint over
+   it by DOM order. */
+.grid-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  display: flex;
+  padding-inline: var(--gutter);
+  pointer-events: none;
+}
+
+.grid-overlay__line {
+  flex: 1;
+  border-right: 1px solid var(--grid-line);
+}
+
+.grid-overlay__line:first-child {
+  border-left: 1px solid var(--grid-line);
+}
+
+/* All 36 lines always render; the column count (36/24/12) switches by
+   hiding the extra ones at the layout breakpoints, and flex:1 spreads
+   the rest evenly. */
+@media (width < 1024px) {
+  .grid-overlay__line:nth-child(n + 25) {
+    display: none;
+  }
+}
+
+@media (width < 768px) {
+  .grid-overlay__line:nth-child(n + 13) {
+    display: none;
+  }
+}

@@ -1,0 +1,26 @@
+.site-header {
+  position: fixed;
+  inset-inline: 0;
+  top: 0;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--gutter);
+  /* White + difference inverts against whatever scrolls underneath:
+     black over light sections, white over dark images and the footer. */
+  color: var(--white);
+  mix-blend-mode: difference;
+}
+
+.site-header__wordmark,
+.site-header__sound-toggle,
+.site-header__archive-link {
+  text-decoration: none;
+}
+
+.site-header__nav {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-4);
+}

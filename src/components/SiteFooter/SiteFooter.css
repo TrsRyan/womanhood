@@ -1,0 +1,54 @@
+/* Same wordmark cutout as .hero, with the same padding so the mask lands
+   in the same spot. Its white background stays below .grid-overlay like
+   .hero's; only its content is lifted above it. */
+.site-footer {
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-160);
+  padding: var(--spacing-16) var(--gutter);
+  background: var(--white);
+  mask-image: linear-gradient(#000, #000), url('/wordmark-mask.svg');
+  mask-size: 100% 100%, calc(100% - var(--gutter) * 2) auto;
+  mask-position: top left, var(--gutter) calc(100% - var(--spacing-16));
+  mask-repeat: no-repeat, no-repeat;
+  mask-composite: exclude;
+  -webkit-mask-composite: xor;
+}
+
+.site-footer__legacy,
+.site-footer__wordmark-clip {
+  position: relative;
+  z-index: 1;
+}
+
+.site-footer__legacy {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.site-footer__legacy a {
+  text-decoration: none;
+}
+
+/* Same role as .hero__title-clip: reserves the wordmark's footprint. */
+.site-footer__wordmark-clip {
+  display: block;
+  width: 100%;
+  aspect-ratio: 1464 / 193;
+}
+
+@media (width < 1024px) {
+  .site-footer {
+    gap: var(--spacing-120);
+  }
+}
+
+@media (width < 768px) {
+  .site-footer {
+    gap: var(--spacing-96);
+  }
+}

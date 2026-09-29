@@ -14,19 +14,6 @@
   grid-row: 1;
 }
 
-/* "Archive" is the page's <h1> -- the design treats it as plain body
-   text (same size/weight as everything else), so this styling exists
-   purely to cancel the browser's default heading appearance, not to
-   create a new visual treatment. */
-.archive__credit-title,
-.archive__credit-text {
-  font-size: var(--font-body);
-  font-weight: 500;
-  line-height: 1.15;
-  letter-spacing: -0.02em;
-  color: var(--black);
-}
-
 .archive__nav {
   grid-column: 5 / span 2;
   grid-row: 1;
@@ -35,24 +22,12 @@
   gap: var(--spacing-24);
 }
 
-.archive__nav-title {
-  font-size: var(--font-body);
-  font-weight: 500;
-  line-height: 1.15;
-  letter-spacing: -0.02em;
-  color: var(--black);
-}
-
 .archive__nav-links {
   display: flex;
   flex-direction: column;
 }
 
 .archive__nav-link {
-  font-size: var(--font-body);
-  font-weight: 500;
-  line-height: 1.15;
-  letter-spacing: -0.02em;
   color: var(--gray-text);
   text-decoration: none;
   white-space: nowrap;
@@ -82,11 +57,6 @@
 }
 
 .archive__toc-link {
-  font-size: var(--font-body);
-  font-weight: 500;
-  line-height: 1.15;
-  letter-spacing: -0.02em;
-  color: var(--black);
   text-decoration: none;
   white-space: nowrap;
 }
@@ -103,20 +73,7 @@
   gap: var(--spacing-24);
 }
 
-.archive__article-title {
-  font-size: var(--font-body);
-  font-weight: 500;
-  line-height: 1.15;
-  letter-spacing: -0.02em;
-  color: var(--black);
-}
-
 .archive__article-paragraph {
-  font-size: var(--font-body);
-  font-weight: 500;
-  line-height: 1.15;
-  letter-spacing: -0.02em;
-  color: var(--black);
   margin-bottom: var(--spacing-24);
 }
 

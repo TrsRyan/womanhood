@@ -1,24 +1,14 @@
-import './App.css'
+import GridOverlay from './components/GridOverlay/GridOverlay.jsx'
+import SiteHeader from './components/SiteHeader/SiteHeader.jsx'
+import SiteFooter from './components/SiteFooter/SiteFooter.jsx'
 import './Archive.css'
-
-const SITE_GRID_COLUMNS = 36
 
 function Archive() {
   return (
     <>
-      <div className="grid-overlay" aria-hidden="true">
-        {Array.from({ length: SITE_GRID_COLUMNS }).map((_, index) => (
-          <span key={index} className="grid-overlay__line" />
-        ))}
-      </div>
+      <GridOverlay />
 
-      <header className="site-header">
-        <a href="/" className="site-header__wordmark">WoManHood</a>
-        <nav className="site-header__nav">
-          <button type="button" className="site-header__sound-toggle">(Sound On),</button>
-          <a href="/archive.html" className="site-header__archive-link">Archive</a>
-        </nav>
-      </header>
+      <SiteHeader />
 
       <main className="archive">
         <div className="archive__container">
@@ -389,17 +379,7 @@ function Archive() {
         </div>
       </main>
 
-      <footer className="site-footer">
-        <div className="site-footer__legacy">
-          <p>© 2023 Womanhood</p>
-          <a href="/archive.html">Cookie Preferences</a>
-          <a href="/archive.html">Privacy Policy</a>
-        </div>
-
-        <span className="site-footer__wordmark-clip">
-          <span className="sr-only">WoManHood</span>
-        </span>
-      </footer>
+      <SiteFooter />
     </>
   )
 }

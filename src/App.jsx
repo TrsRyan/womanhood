@@ -5,6 +5,9 @@ import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { Flip } from 'gsap/Flip'
 import { SplitText } from 'gsap/SplitText'
+import GridOverlay from './components/GridOverlay/GridOverlay.jsx'
+import SiteHeader from './components/SiteHeader/SiteHeader.jsx'
+import SiteFooter from './components/SiteFooter/SiteFooter.jsx'
 import './App.css'
 import transitionImage from './assets/transition-image.jpg'
 import introPrimary from './assets/intro-primary.jpg'
@@ -16,8 +19,6 @@ import pinGallery1 from './assets/pin-gallery-1.jpg'
 import pinGallery2 from './assets/pin-gallery-2.png'
 import pinGallery3 from './assets/pin-gallery-3.jpg'
 import pinGallery4 from './assets/pin-gallery-4.jpg'
-
-const SITE_GRID_COLUMNS = 36
 
 // Pin-gallery timeline rhythm, in timeline units (one image entry = 1).
 const PIN_GALLERY_HOLD = 0.1
@@ -238,23 +239,13 @@ function App() {
 
   return (
     <>
-      <div className="grid-overlay" aria-hidden="true">
-        {Array.from({ length: SITE_GRID_COLUMNS }).map((_, index) => (
-          <span key={index} className="grid-overlay__line" />
-        ))}
-      </div>
+      <GridOverlay />
 
       <div className="transition-image__backdrop" aria-hidden="true" />
 
       <img className="transition-image__img" src={transitionImage} alt="" ref={transitionImageRef} />
 
-      <header className="site-header">
-        <a href="/" className="site-header__wordmark">WoManHood</a>
-        <nav className="site-header__nav">
-          <button type="button" className="site-header__sound-toggle">(Sound On),</button>
-          <a href="/archive.html" className="site-header__archive-link">Archive</a>
-        </nav>
-      </header>
+      <SiteHeader />
 
       <main>
         <section className="hero" ref={heroRef}>
@@ -360,17 +351,7 @@ function App() {
         </div>
       </main>
 
-      <footer className="site-footer">
-        <div className="site-footer__legacy">
-          <p>© 2023 Womanhood</p>
-          <a href="/archive.html">Cookie Preferences</a>
-          <a href="/archive.html">Privacy Policy</a>
-        </div>
-
-        <span className="site-footer__wordmark-clip">
-          <span className="sr-only">WoManHood</span>
-        </span>
-      </footer>
+      <SiteFooter />
     </>
   )
 }
