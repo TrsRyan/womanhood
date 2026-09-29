@@ -14,6 +14,17 @@
   grid-row: 1;
 }
 
+/* The side columns hold still while the articles scroll: sticky at the
+   container's own top padding, so they never move from where they load.
+   align-self:start keeps each one shorter than the row it sticks in. */
+.archive__credit,
+.archive__nav,
+.archive__toc {
+  position: sticky;
+  top: var(--spacing-240);
+  align-self: start;
+}
+
 .archive__nav {
   grid-column: 5 / span 2;
   grid-row: 1;
@@ -99,6 +110,13 @@
     grid-column: 3 / span 6;
   }
 
+  /* Only the nav stays put on tablet: the contacts share the articles'
+     column, so they would sit over the scrolling text. */
+  .archive__credit,
+  .archive__toc {
+    position: static;
+  }
+
   /* Left-aligned on tablet, unlike desktop's right alignment. */
   .archive__toc,
   .archive__toc-links {
@@ -138,6 +156,15 @@
 
   .archive__nav {
     padding-block: var(--spacing-72);
+  }
+
+  /* Nothing in the side blocks sticks on mobile; in this column layout
+     align-self would also shrink them to their text width. */
+  .archive__credit,
+  .archive__toc,
+  .archive__nav {
+    position: static;
+    align-self: auto;
   }
 
   .archive__article-list {
