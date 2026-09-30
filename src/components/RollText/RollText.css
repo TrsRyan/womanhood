@@ -1,0 +1,30 @@
+/* One line tall window: the copy waits just below it, out of sight, and
+   each letter rises through it on hover (RollText.jsx). clip rather than
+   hidden: nothing here needs to scroll. */
+.roll-text {
+  position: relative;
+  display: inline-block;
+  overflow: clip;
+  vertical-align: top;
+}
+
+.roll-text__line {
+  display: block;
+}
+
+.roll-text__line--copy {
+  position: absolute;
+  inset-inline: 0;
+  top: 100%;
+}
+
+/* An unsplit copy of the label, laid over it with invisible glyphs, so the
+   browser draws the exact native underline (text-decoration follows
+   `color`, not the glyph fill) and it stays still while the letters roll. */
+.roll-text__underline {
+  position: absolute;
+  inset: 0;
+  -webkit-text-fill-color: transparent;
+  text-decoration: underline;
+  pointer-events: none;
+}

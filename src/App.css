@@ -433,10 +433,6 @@
   text-indent: var(--spacing-40);
 }
 
-.documentary__quote-link {
-  text-decoration: underline;
-}
-
 .documentary__image--feature {
   grid-column: 5 / span 2;
   grid-row: 2;

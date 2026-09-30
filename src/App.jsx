@@ -5,6 +5,7 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { Flip } from 'gsap/Flip'
 import { SplitText } from 'gsap/SplitText'
 import GridOverlay from './components/GridOverlay/GridOverlay.jsx'
+import RollText from './components/RollText/RollText.jsx'
 import SiteHeader from './components/SiteHeader/SiteHeader.jsx'
 import SiteFooter from './components/SiteFooter/SiteFooter.jsx'
 import './App.css'
@@ -301,7 +302,7 @@ function App() {
               <p className="documentary__quote-text">
                 In 2014, while researching masculinity for the stage, Mille Lundt came across photographs of the Burnesha and never let the subject go. Years later the company went to find them: one in the northern mountains, another by the sea in Durrës.
               </p>
-              <a className="documentary__quote-link" href="/archive.html">Read The Story</a>
+              <a className="documentary__quote-link" href="/archive.html"><RollText underline>Read The Story</RollText></a>
             </div>
 
             <img className="documentary__image documentary__image--feature" src={documentaryFeature} alt="" />

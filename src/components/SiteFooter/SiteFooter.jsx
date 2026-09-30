@@ -4,6 +4,7 @@ import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import transitionImage from '../../assets/transition-image.jpg'
 import { WORDMARK_HEIGHT, WORDMARK_LETTERS, WORDMARK_WIDTH } from './wordmark-letters.js'
+import RollText from '../RollText/RollText.jsx'
 import './SiteFooter.css'
 
 gsap.registerPlugin(ScrollTrigger)
@@ -74,8 +75,8 @@ function SiteFooter() {
       <div className="site-footer__content" ref={contentRef}>
         <div className="site-footer__legacy">
           <p>© 2023 Womanhood</p>
-          <a href="/archive.html">Cookie Preferences</a>
-          <a href="/archive.html">Privacy Policy</a>
+          <a href="/archive.html"><RollText>Cookie Preferences</RollText></a>
+          <a href="/archive.html"><RollText>Privacy Policy</RollText></a>
         </div>
 
         {/* Each letter is drawn twice: filled with the photo, then in black

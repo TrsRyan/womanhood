@@ -1,9 +1,62 @@
+import { useRef } from 'react'
+import { useGSAP } from '@gsap/react'
+import gsap from 'gsap'
+import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import GridOverlay from './components/GridOverlay/GridOverlay.jsx'
 import SiteHeader from './components/SiteHeader/SiteHeader.jsx'
+import RollText from './components/RollText/RollText.jsx'
 import SiteFooter from './components/SiteFooter/SiteFooter.jsx'
 import './Archive.css'
 
+gsap.registerPlugin(ScrollTrigger)
+
+const ACTIVE_LINK_CLASS = 'archive__nav-link--active'
+
 function Archive() {
+  const containerRef = useRef(null)
+  const navRef = useRef(null)
+
+  // The nav tracks the chapter being read, on desktop and tablet where it
+  // stays on screen. A chapter becomes current once its top passes the
+  // nav's own sticky line, 1px lower: the browser stops a chapter reached
+  // from the nav exactly on that line, and ScrollTrigger only counts a
+  // position strictly past its start. clamp() keeps a start within the
+  // scrollable range, so a last chapter too short to reach the line still
+  // becomes current at the bottom of the page.
+  useGSAP(() => {
+    const mm = gsap.matchMedia()
+
+    mm.add('(width >= 768px)', () => {
+      const nav = navRef.current
+      const articles = gsap.utils.toArray('.archive__article', containerRef.current)
+      const links = articles.map((article) => nav.querySelector(`a[href="#${article.id}"]`))
+
+      const setCurrent = (current) => {
+        links.forEach((link, index) => {
+          const isCurrent = index === current
+          link.classList.toggle(ACTIVE_LINK_CLASS, isCurrent)
+          if (isCurrent) link.setAttribute('aria-current', 'location')
+          else link.removeAttribute('aria-current')
+        })
+      }
+
+      const readingLine = () => parseFloat(getComputedStyle(nav).top) + 1
+
+      setCurrent(0)
+
+      articles.forEach((article, index) => {
+        ScrollTrigger.create({
+          trigger: article,
+          start: () => `clamp(top ${readingLine()}px)`,
+          onEnter: () => setCurrent(index),
+          onLeaveBack: () => setCurrent(Math.max(index - 1, 0)),
+        })
+      })
+
+      return () => setCurrent(-1)
+    })
+  }, { scope: containerRef })
+
   return (
     <>
       <GridOverlay />
@@ -11,7 +64,7 @@ function Archive() {
       <SiteHeader />
 
       <main className="archive">
-        <div className="archive__container">
+        <div className="archive__container" ref={containerRef}>
           <div className="archive__credit">
             <h1 className="archive__credit-title">Archive</h1>
             <p className="archive__credit-text">
@@ -23,46 +76,46 @@ function Archive() {
 
           <div className="archive__toc">
             <div className="archive__toc-links">
-              <a className="archive__toc-link" href="mailto:millelundt@gmail.com">millelundt@gmail.com</a>
-              <a className="archive__toc-link" href="tel:+32497976285">+32 497 97 62 85</a>
+              <a className="archive__toc-link" href="mailto:millelundt@gmail.com"><RollText>millelundt@gmail.com</RollText></a>
+              <a className="archive__toc-link" href="tel:+32497976285"><RollText>+32 497 97 62 85</RollText></a>
             </div>
           </div>
 
-          <nav className="archive__nav">
+          <nav className="archive__nav" ref={navRef}>
             <div className="archive__nav-group">
               <p className="archive__nav-title">The Subject</p>
               <div className="archive__nav-links">
-                <a className="archive__nav-link archive__nav-link--active" href="#the-oath" aria-current="location">(01) The oath</a>
-                <a className="archive__nav-link" href="#a-history-of-disguise">(02) A history of disguise</a>
-                <a className="archive__nav-link" href="#four-lives">(03) Four lives</a>
+                <a className="archive__nav-link" href="#the-oath"><RollText>(01) The oath</RollText></a>
+                <a className="archive__nav-link" href="#a-history-of-disguise"><RollText>(02) A history of disguise</RollText></a>
+                <a className="archive__nav-link" href="#four-lives"><RollText>(03) Four lives</RollText></a>
               </div>
             </div>
 
             <div className="archive__nav-group">
               <p className="archive__nav-title">The Making</p>
               <div className="archive__nav-links">
-                <a className="archive__nav-link" href="#the-ethics-of-looking">(04) The ethics of looking</a>
-                <a className="archive__nav-link" href="#filming-in-albania">(05) Filming in Albania</a>
-                <a className="archive__nav-link" href="#building-the-piece">(06) Building the piece</a>
-                <a className="archive__nav-link" href="#research-on-the-body">(07) Research on the body</a>
+                <a className="archive__nav-link" href="#the-ethics-of-looking"><RollText>(04) The ethics of looking</RollText></a>
+                <a className="archive__nav-link" href="#filming-in-albania"><RollText>(05) Filming in Albania</RollText></a>
+                <a className="archive__nav-link" href="#building-the-piece"><RollText>(06) Building the piece</RollText></a>
+                <a className="archive__nav-link" href="#research-on-the-body"><RollText>(07) Research on the body</RollText></a>
               </div>
             </div>
 
             <div className="archive__nav-group">
               <p className="archive__nav-title">The Piece</p>
               <div className="archive__nav-links">
-                <a className="archive__nav-link" href="#the-stage">(08) The stage</a>
-                <a className="archive__nav-link" href="#the-music">(09) The music</a>
-                <a className="archive__nav-link" href="#shakespeares-viola">(10) Shakespeare&apos;s Viola</a>
-                <a className="archive__nav-link" href="#facing-an-audience">(11) Facing an audience</a>
+                <a className="archive__nav-link" href="#the-stage"><RollText>(08) The stage</RollText></a>
+                <a className="archive__nav-link" href="#the-music"><RollText>(09) The music</RollText></a>
+                <a className="archive__nav-link" href="#shakespeares-viola"><RollText>(10) Shakespeare&apos;s Viola</RollText></a>
+                <a className="archive__nav-link" href="#facing-an-audience"><RollText>(11) Facing an audience</RollText></a>
               </div>
             </div>
 
             <div className="archive__nav-group">
               <p className="archive__nav-title">The Record</p>
               <div className="archive__nav-links">
-                <a className="archive__nav-link" href="#the-company">(12) The company</a>
-                <a className="archive__nav-link" href="#credits">(13) Credits</a>
+                <a className="archive__nav-link" href="#the-company"><RollText>(12) The company</RollText></a>
+                <a className="archive__nav-link" href="#credits"><RollText>(13) Credits</RollText></a>
               </div>
             </div>
           </nav>
