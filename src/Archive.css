@@ -158,6 +158,12 @@
     padding-block: var(--spacing-72);
   }
 
+  /* The nav scrolls away with the page here, so it never tracks the
+     chapter being read: every link keeps the same color. */
+  .archive__nav-link--active {
+    color: var(--gray-text);
+  }
+
   /* Nothing in the side blocks sticks on mobile; in this column layout
      align-self would also shrink them to their text width. */
   .archive__credit,
