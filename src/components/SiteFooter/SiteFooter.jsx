@@ -1,4 +1,5 @@
 import { useRef } from 'react'
+import { Link } from 'react-router'
 import { useGSAP } from '@gsap/react'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
@@ -75,8 +76,8 @@ function SiteFooter() {
       <div className="site-footer__content" ref={contentRef}>
         <div className="site-footer__legacy">
           <p>© 2023 Womanhood</p>
-          <a href="/archive.html"><RollText>Cookie Preferences</RollText></a>
-          <a href="/archive.html"><RollText>Privacy Policy</RollText></a>
+          <Link to="/archive"><RollText>Cookie Preferences</RollText></Link>
+          <Link to="/archive"><RollText>Privacy Policy</RollText></Link>
         </div>
 
         {/* Each letter is drawn twice: filled with the photo, then in black

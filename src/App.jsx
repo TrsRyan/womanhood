@@ -1,4 +1,5 @@
 import { useRef } from 'react'
+import { Link } from 'react-router'
 import { useGSAP } from '@gsap/react'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
@@ -276,7 +277,7 @@ function App() {
           </section>
 
           <section className="narrative">
-            <img className="narrative__background" src={narrativeBackground} alt="" />
+            <img className="narrative__background" src={narrativeBackground} alt="" width={2731} height={4096} />
 
             <div className="narrative__header">
               <p className="narrative__index-label">(02)</p>
@@ -302,7 +303,7 @@ function App() {
               <p className="documentary__quote-text">
                 In 2014, while researching masculinity for the stage, Mille Lundt came across photographs of the Burnesha and never let the subject go. Years later the company went to find them: one in the northern mountains, another by the sea in Durrës.
               </p>
-              <a className="documentary__quote-link" href="/archive.html"><RollText underline>Read The Story</RollText></a>
+              <Link className="documentary__quote-link" to="/archive"><RollText underline>Read The Story</RollText></Link>
             </div>
 
             <img className="documentary__image documentary__image--feature" src={documentaryFeature} alt="" />
