@@ -13,12 +13,6 @@
   mix-blend-mode: difference;
 }
 
-.site-header__wordmark,
-.site-header__sound-toggle,
-.site-header__archive-link {
-  text-decoration: none;
-}
-
 .site-header__nav {
   display: flex;
   align-items: center;

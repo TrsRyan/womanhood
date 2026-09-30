@@ -23,10 +23,6 @@
   align-items: center;
 }
 
-.site-footer__legacy a {
-  text-decoration: none;
-}
-
 /* Full content width; the viewBox sets the height. Same footprint as
    .hero__title-clip, so both wordmarks line up. */
 .site-footer__wordmark {

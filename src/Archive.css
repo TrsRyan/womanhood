@@ -40,7 +40,6 @@
 
 .archive__nav-link {
   color: var(--gray-text);
-  text-decoration: none;
   white-space: nowrap;
   transition:
     color var(--duration-quick) var(--ease-out-quart),
@@ -76,7 +75,6 @@
 }
 
 .archive__toc-link {
-  text-decoration: none;
   white-space: nowrap;
 }
 
