@@ -18,13 +18,13 @@ const ROLL_STAGGER = 0.01
 // taken over, both snap back unseen (the two are identical), so every
 // hover rolls upward again. A hover while it plays is ignored rather than
 // restarting it mid-roll. Mouse only, and off when reduced motion is asked.
-// With `underline`, the label keeps a still underline under the rolling
-// letters: split letters are inline-blocks, which a link's own underline
-// never reaches.
+// With `underline`, a line under the label wipes out to the right and back
+// in from the left during the roll.
 function RollText({ children, underline = false }) {
   const rootRef = useRef(null)
   const originalRef = useRef(null)
   const copyRef = useRef(null)
+  const underlineRef = useRef(null)
 
   useGSAP(() => {
     const mm = gsap.matchMedia()
@@ -42,6 +42,18 @@ function RollText({ children, underline = false }) {
         .to(originalChars, rise, 0)
         .to(copyChars, rise, 0)
 
+      // The wipe is laid out linearly, then played through the roll's own
+      // ease over the roll's full length: the line keeps the letters' pace,
+      // and swaps sides at their fastest point, half way up.
+      if (underline) {
+        const wipe = gsap.timeline({ paused: true })
+          .to(underlineRef.current, { scaleX: 0, ease: 'none', duration: 1 })
+          .set(underlineRef.current, { transformOrigin: 'left' })
+          .to(underlineRef.current, { scaleX: 1, ease: 'none', duration: 1 })
+
+        roll.add(wipe.tweenFromTo(0, wipe.duration(), { ease: ROLL_EASE, duration: roll.duration() }), 0)
+      }
+
       // A link marking where the reader already is (aria-current) reads as
       // a position, not an invitation, so it doesn't roll.
       const onEnter = () => {
@@ -56,9 +68,11 @@ function RollText({ children, underline = false }) {
 
   return (
     <span className="roll-text" ref={rootRef}>
-      <span className="roll-text__line" ref={originalRef}>{children}</span>
-      <span className="roll-text__line roll-text__line--copy" aria-hidden="true" ref={copyRef}>{children}</span>
-      {underline && <span className="roll-text__underline" aria-hidden="true">{children}</span>}
+      <span className="roll-text__mask">
+        <span className="roll-text__line" ref={originalRef}>{children}</span>
+        <span className="roll-text__line roll-text__line--copy" aria-hidden="true" ref={copyRef}>{children}</span>
+      </span>
+      {underline && <span className="roll-text__underline" aria-hidden="true" ref={underlineRef} />}
     </span>
   )
 }
