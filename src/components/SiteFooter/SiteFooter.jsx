@@ -1,4 +1,4 @@
-import { useLayoutEffect, useRef } from 'react'
+import { useRef } from 'react'
 import { useGSAP } from '@gsap/react'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
@@ -15,32 +15,18 @@ function SiteFooter() {
   const contentRef = useRef(null)
   const shadeRef = useRef(null)
 
-  // The content is position:fixed, so it can't size its own window:
-  // the window copies its height, now and whenever it changes (breakpoint,
-  // font load). Set before paint and before the page's ScrollTriggers
-  // measure it.
-  useLayoutEffect(() => {
-    const footer = footerRef.current
-    const content = contentRef.current
-    const syncHeight = () => {
-      footer.style.height = `${content.getBoundingClientRect().height}px`
-    }
-
-    syncHeight()
-    const observer = new ResizeObserver(syncHeight)
-    observer.observe(content)
-    return () => observer.disconnect()
-  }, [])
-
-  // The shade lifts as the window scrolls into view: black when its top
-  // reaches the bottom of the screen, gone once it is fully uncovered.
-  // refreshPriority -1: this ScrollTrigger is created before the ones
-  // above it on the page (child effects run first), so it must be
+  // The page scrolls off the footer like a curtain: the content starts
+  // shifted up by its own height and slides back as the footer scrolls into
+  // view, cancelling out the scroll, so it holds still on screen while it
+  // is uncovered. It stays in flow, not position:fixed, so the whole footer
+  // moves with the page in iOS's overscroll bounce. The shade lifts over
+  // the same distance: black when the footer's top reaches the bottom of
+  // the screen, gone once it is fully uncovered.
+  // refreshPriority -1: these ScrollTriggers are created before the ones
+  // above them on the page (child effects run first), so they must be
   // measured after their pins have added their scroll distance.
   useGSAP(() => {
-    gsap.fromTo(shadeRef.current, { opacity: 1 }, {
-      opacity: 0,
-      ease: 'none',
+    gsap.timeline({
       scrollTrigger: {
         trigger: footerRef.current,
         start: 'top bottom',
@@ -49,6 +35,8 @@ function SiteFooter() {
         refreshPriority: -1,
       },
     })
+      .fromTo(contentRef.current, { yPercent: -100 }, { yPercent: 0, ease: 'none' }, 0)
+      .fromTo(shadeRef.current, { opacity: 1 }, { opacity: 0, ease: 'none' }, 0)
 
     // The letters rise one after another from below the wordmark, where
     // the SVG's own overflow clipping hides them, with the same ease as

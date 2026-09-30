@@ -1,17 +1,14 @@
-/* Reveal footer: this in-flow box is a window onto the content, which is
-   fixed to the bottom of the viewport. clip-path limits the content, and
-   its pointer events, to the window, so the footer only shows as the page
-   scrolls off it, never through the transparent areas above. The whole
-   footer stays below .grid-overlay, like .hero. Height is set in
-   SiteFooter.jsx. */
+/* Reveal footer: the content slides into this box as it scrolls into view
+   (SiteFooter.jsx). clip-path limits the content, and its pointer events,
+   to the box, so the footer only shows as the page scrolls off it, never
+   through the transparent areas above. The whole footer stays below
+   .grid-overlay, like .hero. */
 .site-footer {
   clip-path: inset(0);
 }
 
 .site-footer__content {
-  position: fixed;
-  inset-inline: 0;
-  bottom: 0;
+  position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
