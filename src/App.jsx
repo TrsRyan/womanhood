@@ -174,8 +174,10 @@ function App() {
       pinGalleryTimeline.to({}, { duration: PIN_GALLERY_END_HOLD })
 
       // Re-render at the current scroll position with the new measurements.
-      // Events are suppressed so the rebuild never replays the questions.
-      pinGalleryTimeline.time(0, true).time(time, true)
+      // Events stay on: Flip's final cleanup is a callback, skipped if the
+      // jump suppressed it. The questions don't replay, since both jumps
+      // land in the same tick and their handler only acts on a change.
+      pinGalleryTimeline.time(0).time(time)
     })
 
     // The questions play on their own clock rather than the scroll. autoSplit
