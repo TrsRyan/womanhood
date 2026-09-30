@@ -49,6 +49,36 @@ function SiteFooter() {
         refreshPriority: -1,
       },
     })
+
+    // The letters rise one after another from below the wordmark, where
+    // the SVG's own overflow clipping hides them, with the same ease as
+    // the pin-gallery questions. Played rather than scrubbed, once the
+    // footer is half uncovered so the shade doesn't hide it.
+    const lettersReveal = gsap.fromTo('.site-footer__letter', { y: WORDMARK_HEIGHT }, {
+      y: 0,
+      ease: 'power3.out',
+      duration: 0.9,
+      stagger: 0.04,
+      paused: true,
+    })
+
+    // Two triggers, as GSAP recommends for playing and resetting at
+    // different points: the reveal plays half way in, and only rewinds,
+    // instantly, once the page has fully covered the footer again, so the
+    // reset is never seen and the next visit always starts from scratch.
+    ScrollTrigger.create({
+      trigger: footerRef.current,
+      start: 'center bottom',
+      onEnter: () => lettersReveal.play(),
+      refreshPriority: -1,
+    })
+
+    ScrollTrigger.create({
+      trigger: footerRef.current,
+      start: 'top bottom',
+      onLeaveBack: () => lettersReveal.pause(0),
+      refreshPriority: -1,
+    })
   }, { scope: footerRef })
 
   return (
