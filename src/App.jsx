@@ -48,7 +48,8 @@ function App() {
     // runs throughout, the dezoom and the fade to the black backdrop only
     // near the end. While they overlap, scale must stay >= 1 +
     // |yPercent| / 50, or the image no longer covers the viewport and
-    // an edge shows.
+    // an edge shows. autoAlpha also sets visibility:hidden once the fade
+    // is over, so the browser stops rendering the image.
     const transitionImageTimeline = gsap.timeline({
       scrollTrigger: {
         trigger: heroRef.current,
@@ -62,7 +63,7 @@ function App() {
     transitionImageTimeline
       .fromTo(transitionImageRef.current, { yPercent: 8 }, { yPercent: -8, ease: 'none', duration: 1 }, 0)
       .fromTo(transitionImageRef.current, { scale: 1.22 }, { scale: 1.18, ease: 'none', duration: 0.4 }, 0.8)
-      .fromTo(transitionImageRef.current, { opacity: 1 }, { opacity: 0, ease: 'none', duration: 0.4 }, 0.8)
+      .fromTo(transitionImageRef.current, { autoAlpha: 1 }, { autoAlpha: 0, ease: 'none', duration: 0.4 }, 0.8)
   })
 
   // Declared after the block above so its ScrollTrigger is created after
@@ -229,26 +230,28 @@ function App() {
     <>
       <GridOverlay />
 
-      <div className="transition-image__backdrop" aria-hidden="true" />
-
-      <img className="transition-image__img" src={transitionImage} alt="" ref={transitionImageRef} />
-
       <SiteHeader />
 
       <main>
-        <section className="hero" ref={heroRef}>
-          <div className="hero__tagline-row">
-            <p className="hero__tagline">
-              Three female characters searching for the fine line between Man and Woman. Blending fiction and reality, circus arts, music, and documentary.
-            </p>
-          </div>
+        <div className="transition-scene">
+          <div className="transition-image__backdrop" aria-hidden="true" />
 
-          <span className="hero__title-clip">
-            <span className="sr-only">WoManHood</span>
-          </span>
-        </section>
+          <img className="transition-image__img" src={transitionImage} alt="" ref={transitionImageRef} />
 
-        <div className="transition-image__spacer" aria-hidden="true" ref={transitionSpacerRef} />
+          <section className="hero" ref={heroRef}>
+            <div className="hero__tagline-row">
+              <p className="hero__tagline">
+                Three female characters searching for the fine line between Man and Woman. Blending fiction and reality, circus arts, music, and documentary.
+              </p>
+            </div>
+
+            <span className="hero__title-clip">
+              <span className="sr-only">WoManHood</span>
+            </span>
+          </section>
+
+          <div className="transition-image__spacer" aria-hidden="true" ref={transitionSpacerRef} />
+        </div>
 
         <div className="page-content">
           <section className="intro">

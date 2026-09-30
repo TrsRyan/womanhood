@@ -80,6 +80,15 @@
   aspect-ratio: 1464 / 193;
 }
 
+/* Scopes the two fixed layers below to the hero + spacer: they stay fixed
+   to the viewport but only show within this box, so they never appear
+   further down the page (e.g. in iOS's overscroll bounce under the
+   footer). clip-path, unlike transform, keeps position:fixed relative to
+   the viewport. */
+.transition-scene {
+  clip-path: inset(0);
+}
+
 /* Behind the transition image, so its fade-out reveals black rather
    than the page's white. */
 .transition-image__backdrop {
@@ -89,12 +98,13 @@
   background: var(--black);
 }
 
-/* Fixed for good (a sticky element would eventually release) and behind
-   the whole page, so it only shows through .hero's cutout and the empty
-   spacer below. Root-level for the same transformed-ancestor reason as
-   .grid-overlay. The box stays exactly 100vh because object-fit:cover
-   crops from it; the parallax slack comes from GSAP's scale instead, and
-   GSAP owns the whole transform (no CSS transform here). */
+/* Fixed for the whole scene (a sticky element would release as .intro
+   starts covering it) and behind .hero, so it only shows through .hero's
+   cutout and the empty spacer below. No ancestor may get a transform,
+   for the same reason as .grid-overlay. The box stays exactly 100vh
+   because object-fit:cover crops from it; the parallax slack comes from
+   GSAP's scale instead, and GSAP owns the whole transform (no CSS
+   transform here). */
 .transition-image__img {
   position: fixed;
   inset: 0;
