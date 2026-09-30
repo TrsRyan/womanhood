@@ -42,10 +42,18 @@
   color: var(--gray-text);
   text-decoration: none;
   white-space: nowrap;
+  transition:
+    color var(--duration-quick) var(--ease-out-quart),
+    translate var(--duration-quick) var(--ease-out-quart);
 }
 
+/* The current chapter's link (set in Archive.jsx) darkens and steps
+   right, so the reader's place stands out in the list. Quick and
+   ease-out: a fast scroll swaps the current link mid-transition, and a
+   curve that starts fast has already done most of its move by then. */
 .archive__nav-link--active {
   color: var(--black);
+  translate: var(--spacing-10) 0;
 }
 
 .archive__content {
@@ -159,12 +167,6 @@
 
   .archive__nav {
     padding-block: var(--spacing-72);
-  }
-
-  /* The nav scrolls away with the page here, so it never tracks the
-     chapter being read: every link keeps the same color. */
-  .archive__nav-link--active {
-    color: var(--gray-text);
   }
 
   /* Nothing in the side blocks sticks on mobile; in this column layout

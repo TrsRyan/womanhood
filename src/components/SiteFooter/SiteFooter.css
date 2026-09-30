@@ -37,7 +37,7 @@
 
 .site-footer__letter-ink {
   fill: var(--black);
-  transition: opacity 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+  transition: opacity var(--duration-state) var(--ease-out-quint);
 }
 
 /* Mouse and trackpad only: on touch screens a tap would leave the letter
