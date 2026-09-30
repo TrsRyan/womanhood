@@ -78,10 +78,13 @@
   gap: var(--spacing-96);
 }
 
+/* A chapter reached from the nav stops level with the sticky side
+   columns, where the first chapter sits on load. */
 .archive__article {
   display: flex;
   flex-direction: column;
   gap: var(--spacing-24);
+  scroll-margin-top: var(--spacing-240);
 }
 
 .archive__article-paragraph {
@@ -178,8 +181,11 @@
     padding-bottom: var(--spacing-160);
   }
 
+  /* No side columns to line up with: a chapter stops at the top, where
+     its sticky title takes over. */
   .archive__article {
     gap: var(--spacing-14);
+    scroll-margin-top: 0;
   }
 
   /* Each chapter title sticks to the top while its chapter is read, then
