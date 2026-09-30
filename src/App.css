@@ -667,3 +667,15 @@
     padding-inline: 0;
   }
 }
+
+/* End state of the last image's morph, after the breakpoint rules so
+   their grid-column can't override it. An absolute grid item still takes
+   its grid area as containing block; grid-area:auto resets that to the
+   whole images box, i.e. the full stage. The explicit height overrides
+   the item's aspect-ratio. */
+.pin-gallery__item--fullscreen {
+  grid-area: auto;
+  position: absolute;
+  inset: 0;
+  height: 100%;
+}

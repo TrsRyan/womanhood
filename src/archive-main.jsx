@@ -1,13 +1,13 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
-import { ReactLenis } from 'lenis/react'
+import SmoothScroll from './components/SmoothScroll/SmoothScroll.jsx'
 import './index.css'
 import Archive from './Archive.jsx'
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-    <ReactLenis root>
+    <SmoothScroll>
       <Archive />
-    </ReactLenis>
+    </SmoothScroll>
   </StrictMode>,
 )

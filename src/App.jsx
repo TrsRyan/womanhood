@@ -1,6 +1,5 @@
 import { useRef } from 'react'
 import { useGSAP } from '@gsap/react'
-import { useLenis } from 'lenis/react'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { Flip } from 'gsap/Flip'
@@ -32,6 +31,8 @@ const PIN_GALLERY_EASE = 'power1.inOut'
 const PIN_GALLERY_END_HOLD = 1
 // How long each word of the lead takes to turn from gray to black.
 const PIN_GALLERY_WORD_FILL = 0.3
+// End state of the last image's morph, defined in App.css.
+const FULLSCREEN_CLASS = 'pin-gallery__item--fullscreen'
 
 gsap.registerPlugin(ScrollTrigger, Flip, SplitText)
 
@@ -41,18 +42,8 @@ function App() {
   const transitionSpacerRef = useRef(null)
   const pinGalleryRef = useRef(null)
   const pinGalleryStageRef = useRef(null)
-  const lenis = useLenis()
 
   useGSAP(() => {
-    if (!lenis) return
-
-    // Lenis's documented GSAP setup: autoRaf is off (main.jsx) and
-    // gsap.ticker drives Lenis, so both run on one shared clock.
-    const syncLenis = (time) => lenis.raf(time * 1000)
-    gsap.ticker.add(syncLenis)
-    gsap.ticker.lagSmoothing(0)
-    lenis.on('scroll', ScrollTrigger.update)
-
     // One timeline over the hero + spacer window: the parallax (yPercent)
     // runs throughout, the dezoom and the fade to the black backdrop only
     // near the end. While they overlap, scale must stay >= 1 +
@@ -72,19 +63,12 @@ function App() {
       .fromTo(transitionImageRef.current, { yPercent: 8 }, { yPercent: -8, ease: 'none', duration: 1 }, 0)
       .fromTo(transitionImageRef.current, { scale: 1.22 }, { scale: 1.18, ease: 'none', duration: 0.4 }, 0.8)
       .fromTo(transitionImageRef.current, { opacity: 1 }, { opacity: 0, ease: 'none', duration: 0.4 }, 0.8)
+  })
 
-    return () => {
-      gsap.ticker.remove(syncLenis)
-      lenis.off('scroll', ScrollTrigger.update)
-    }
-  }, [lenis])
-
-  // Gated on lenis like the block above so its ScrollTrigger is created
-  // after the transition image's: ScrollTriggers must be created in page
-  // order (top to bottom) to refresh correctly.
+  // Declared after the block above so its ScrollTrigger is created after
+  // the transition image's: ScrollTriggers must be created in page order
+  // (top to bottom) to refresh correctly.
   useGSAP((context, contextSafe) => {
-    if (!lenis) return
-
     const stage = pinGalleryStageRef.current
 
     // The stage is pinned, not the section: GSAP's pinSpacing then adds
@@ -105,7 +89,7 @@ function App() {
     // Entry (1) + hold + exit (1): how long each image spends crossing.
     const imageLifetime = 2 + PIN_GALLERY_HOLD
 
-    // The travel distance and Flip.fit are both measured in pixels, so the
+    // The travel distance and Flip's grid state are both in pixels, so the
     // timeline is rebuilt whenever the stage itself changes size (GSAP's
     // recommended fix for Flip + resize). Only the tweens are rebuilt,
     // never the pin, so the page never jumps. The stage is 100lvh, which
@@ -129,6 +113,7 @@ function App() {
 
       const time = pinGalleryTimeline.time()
       pinGalleryTimeline.clear()
+      lastItem.classList.remove(FULLSCREEN_CLASS)
       gsap.set([...images, lastItem], { clearProps: 'all' })
 
       // Each image scrolls up across the stage at a constant speed, from
@@ -149,15 +134,18 @@ function App() {
         }
 
         // The last image eases to a stop at its grid position, then its
-        // item is resized to cover the stage. absolute: lifts the item out
-        // of the grid while it grows, so the grid's vertical centering
-        // can't drift it off course.
+        // item grows into its fullscreen state. Flip records the grid
+        // position, the class switches the item to the stage-covering
+        // layout, and Flip.from animates between the two. At the end Flip
+        // clears its inline values, so CSS alone sizes the final frame.
         const settleDuration = imageLifetime / 2
+        const gridState = Flip.getState(lastItem)
+        lastItem.classList.add(FULLSCREEN_CLASS)
 
         pinGalleryTimeline
           .fromTo(image, { y: travel }, { y: 0, ease: PIN_GALLERY_EASE, duration: settleDuration }, start)
           .add(
-            Flip.fit(lastItem, stage, { absolute: true, ease: PIN_GALLERY_EASE, duration: 2.5 }),
+            Flip.from(gridState, { ease: PIN_GALLERY_EASE, duration: 2.5 }),
             start + settleDuration + PIN_GALLERY_HOLD,
           )
       })
@@ -235,7 +223,7 @@ function App() {
     stageObserver.observe(stage)
 
     return () => stageObserver.disconnect()
-  }, { dependencies: [lenis], scope: pinGalleryRef })
+  }, { scope: pinGalleryRef })
 
   return (
     <>
