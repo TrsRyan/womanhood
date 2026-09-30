@@ -1,5 +1,4 @@
 import { useRef } from 'react'
-import { Link } from 'react-router'
 import { useGSAP } from '@gsap/react'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
@@ -30,7 +29,7 @@ function Archive() {
     mm.add('(width >= 768px)', () => {
       const nav = navRef.current
       const articles = gsap.utils.toArray('.archive__article', containerRef.current)
-      const links = articles.map((article) => nav.querySelector(`a[href$="#${article.id}"]`))
+      const links = articles.map((article) => nav.querySelector(`a[href="#${article.id}"]`))
 
       const setCurrent = (current) => {
         links.forEach((link, index) => {
@@ -86,37 +85,37 @@ function Archive() {
             <div className="archive__nav-group">
               <p className="archive__nav-title">The Subject</p>
               <div className="archive__nav-links">
-                <Link className="archive__nav-link" to="#the-oath"><RollText>(01) The oath</RollText></Link>
-                <Link className="archive__nav-link" to="#a-history-of-disguise"><RollText>(02) A history of disguise</RollText></Link>
-                <Link className="archive__nav-link" to="#four-lives"><RollText>(03) Four lives</RollText></Link>
+                <a className="archive__nav-link" href="#the-oath"><RollText>(01) The oath</RollText></a>
+                <a className="archive__nav-link" href="#a-history-of-disguise"><RollText>(02) A history of disguise</RollText></a>
+                <a className="archive__nav-link" href="#four-lives"><RollText>(03) Four lives</RollText></a>
               </div>
             </div>
 
             <div className="archive__nav-group">
               <p className="archive__nav-title">The Making</p>
               <div className="archive__nav-links">
-                <Link className="archive__nav-link" to="#the-ethics-of-looking"><RollText>(04) The ethics of looking</RollText></Link>
-                <Link className="archive__nav-link" to="#filming-in-albania"><RollText>(05) Filming in Albania</RollText></Link>
-                <Link className="archive__nav-link" to="#building-the-piece"><RollText>(06) Building the piece</RollText></Link>
-                <Link className="archive__nav-link" to="#research-on-the-body"><RollText>(07) Research on the body</RollText></Link>
+                <a className="archive__nav-link" href="#the-ethics-of-looking"><RollText>(04) The ethics of looking</RollText></a>
+                <a className="archive__nav-link" href="#filming-in-albania"><RollText>(05) Filming in Albania</RollText></a>
+                <a className="archive__nav-link" href="#building-the-piece"><RollText>(06) Building the piece</RollText></a>
+                <a className="archive__nav-link" href="#research-on-the-body"><RollText>(07) Research on the body</RollText></a>
               </div>
             </div>
 
             <div className="archive__nav-group">
               <p className="archive__nav-title">The Piece</p>
               <div className="archive__nav-links">
-                <Link className="archive__nav-link" to="#the-stage"><RollText>(08) The stage</RollText></Link>
-                <Link className="archive__nav-link" to="#the-music"><RollText>(09) The music</RollText></Link>
-                <Link className="archive__nav-link" to="#shakespeares-viola"><RollText>(10) Shakespeare&apos;s Viola</RollText></Link>
-                <Link className="archive__nav-link" to="#facing-an-audience"><RollText>(11) Facing an audience</RollText></Link>
+                <a className="archive__nav-link" href="#the-stage"><RollText>(08) The stage</RollText></a>
+                <a className="archive__nav-link" href="#the-music"><RollText>(09) The music</RollText></a>
+                <a className="archive__nav-link" href="#shakespeares-viola"><RollText>(10) Shakespeare&apos;s Viola</RollText></a>
+                <a className="archive__nav-link" href="#facing-an-audience"><RollText>(11) Facing an audience</RollText></a>
               </div>
             </div>
 
             <div className="archive__nav-group">
               <p className="archive__nav-title">The Record</p>
               <div className="archive__nav-links">
-                <Link className="archive__nav-link" to="#the-company"><RollText>(12) The company</RollText></Link>
-                <Link className="archive__nav-link" to="#credits"><RollText>(13) Credits</RollText></Link>
+                <a className="archive__nav-link" href="#the-company"><RollText>(12) The company</RollText></a>
+                <a className="archive__nav-link" href="#credits"><RollText>(13) Credits</RollText></a>
               </div>
             </div>
           </nav>

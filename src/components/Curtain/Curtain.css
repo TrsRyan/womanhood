@@ -1,0 +1,58 @@
+/* Black bands laid on the site grid: a gutter track at each edge plus the
+   layout's columns. The first and last bands also cover the gutters, so
+   every band edge falls on a column line. Above everything, header
+   included; clicks pass through. All 12 bands always render, and the
+   extra ones are hidden at the layout breakpoints, like .grid-overlay. */
+.curtain {
+  position: fixed;
+  inset: 0;
+  z-index: 3;
+  display: grid;
+  grid-template-columns: var(--gutter) repeat(12, 1fr) var(--gutter);
+  pointer-events: none;
+}
+
+/* Set once the bands have fully closed (Curtain.jsx): with the curtain's
+   own background black, no sub-pixel seam between two bands can let the
+   page show through. */
+.curtain--closed {
+  background: var(--black);
+}
+
+.curtain__band {
+  background: var(--black);
+  transform: scaleX(0);
+}
+
+.curtain__band:first-child,
+.curtain__band:nth-child(12) {
+  grid-column: span 2;
+}
+
+@media (width < 1024px) {
+  .curtain {
+    grid-template-columns: var(--gutter) repeat(8, 1fr) var(--gutter);
+  }
+
+  .curtain__band:nth-child(8) {
+    grid-column: span 2;
+  }
+
+  .curtain__band:nth-child(n + 9) {
+    display: none;
+  }
+}
+
+@media (width < 768px) {
+  .curtain {
+    grid-template-columns: var(--gutter) repeat(4, 1fr) var(--gutter);
+  }
+
+  .curtain__band:nth-child(4) {
+    grid-column: span 2;
+  }
+
+  .curtain__band:nth-child(n + 5) {
+    display: none;
+  }
+}
