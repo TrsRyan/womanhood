@@ -2,6 +2,7 @@ import { useGSAP } from '@gsap/react'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { createTextReveal } from '../animation/textReveal.js'
+import { siteOpen } from '../animation/siteOpen.js'
 
 gsap.registerPlugin(ScrollTrigger)
 
@@ -30,11 +31,13 @@ function useTextReveal(scopeRef, { triggerRef, start = 'top 90%' } = {}) {
           // pin above has added its scroll distance.
           const trigger = triggerRef?.current ?? element
 
+          // A text already on screen at load waits for Enter, so it plays
+          // as the site opens rather than behind the enter screen.
           ScrollTrigger.create({
             trigger,
             start,
             refreshPriority: -1,
-            onEnter: () => reveal.play(),
+            onEnter: () => siteOpen.then(reveal.play),
           })
 
           ScrollTrigger.create({

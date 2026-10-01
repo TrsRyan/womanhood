@@ -1,0 +1,18 @@
+/* Above the curtain (z-index 3, Curtain.css), centered on its black. */
+.enter-screen {
+  position: fixed;
+  inset: 0;
+  z-index: 4;
+  display: grid;
+  place-items: center;
+  color: var(--white);
+  pointer-events: none;
+}
+
+.enter-screen__button {
+  pointer-events: auto;
+}
+
+.enter-screen__button:disabled {
+  cursor: default;
+}

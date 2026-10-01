@@ -4,7 +4,9 @@ import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { useLenis } from 'lenis/react'
 import Curtain from '../Curtain/Curtain.jsx'
+import EnterScreen from '../EnterScreen/EnterScreen.jsx'
 import { waitForPageReady } from '../../animation/pageReady.js'
+import { openSite } from '../../animation/siteOpen.js'
 
 gsap.registerPlugin(ScrollTrigger)
 
@@ -34,7 +36,9 @@ const readScrollPositions = () => {
 // the same sequence: the page on screen stays frozen while the curtain
 // closes, the next page swaps in behind the black, the scroll is placed
 // and measured, then the curtain opens. The URL changes first; the page
-// on screen only catches up behind the curtain.
+// on screen only catches up behind the curtain. A full page load starts
+// with the curtain already closed, under the enter screen: it opens on
+// Enter, once the page is ready.
 function PageTransition() {
   const location = useLocation()
   const navigationType = useNavigationType()
@@ -44,10 +48,15 @@ function PageTransition() {
   const curtainRef = useRef(null)
 
   const [page, setPage] = useState(() => ({ outlet, location, navigationType }))
-  const [curtainClosed, setCurtainClosed] = useState(false)
+  // The site loads behind the closed curtain, under the enter screen.
+  const [curtainClosed, setCurtainClosed] = useState(true)
+  // 'loading', 'ready' (Enter can be clicked), 'entered'.
+  const [entry, setEntry] = useState('loading')
   const [scrollPositions] = useState(readScrollPositions)
-  // 'idle', 'closing', 'closed' (waiting for the URL to commit), 'opening'.
-  const phase = useRef('idle')
+  // 'entry' (until Enter), 'idle', 'closing', 'closed' (waiting for the
+  // URL to commit), 'opening'. A page change asked for during the entry
+  // waits for it to end.
+  const phase = useRef('entry')
   const firstPage = useRef(true)
   const latest = useRef({ outlet, location, navigationType })
 
@@ -110,8 +119,10 @@ function PageTransition() {
 
     if (firstPage.current) {
       firstPage.current = false
+      curtainRef.current.cover()
       const saved = scrollPositions.get(page.location.key)
       if (saved !== undefined) window.scrollTo(0, saved)
+      waitForPageReady().then(() => setEntry('ready'))
       return
     }
 
@@ -137,6 +148,24 @@ function PageTransition() {
     })
   }, [page, lenis, scrollPositions])
 
+  // Until Enter, the page can't be scrolled (Lenis only exists after the
+  // first render, hence an effect) nor reached by keyboard or screen
+  // reader: #root is inert, the enter screen sits outside it.
+  useEffect(() => {
+    if (entry !== 'entered') lenis?.stop()
+  }, [entry, lenis])
+
+  useEffect(() => {
+    document.getElementById('root').inert = entry !== 'entered'
+  }, [entry])
+
+  const enter = () => {
+    setEntry('entered')
+    openSite()
+    lenis?.start()
+    reveal()
+  }
+
   useEffect(() => {
     const savePositions = () => {
       scrollPositions.set(latest.current.location.key, window.scrollY)
@@ -160,6 +189,7 @@ function PageTransition() {
     <>
       {shownOutlet}
       <Curtain ref={curtainRef} />
+      {entry !== 'entered' && <EnterScreen ready={entry === 'ready'} onEnter={enter} />}
     </>
   )
 }
