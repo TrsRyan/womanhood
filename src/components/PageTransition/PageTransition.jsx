@@ -4,6 +4,7 @@ import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { useLenis } from 'lenis/react'
 import Curtain from '../Curtain/Curtain.jsx'
+import { waitForPageReady } from '../../animation/pageReady.js'
 
 gsap.registerPlugin(ScrollTrigger)
 
@@ -121,13 +122,19 @@ function PageTransition() {
     // up to 250ms late.
     ScrollTrigger.refresh()
     lenis.resize()
-    lenis.start()
 
     const { location: shown, navigationType: arrivedBy } = page
     const target = arrivedBy === 'POP' ? (scrollPositions.get(shown.key) ?? 0) : shown.hash || 0
     lenis.scrollTo(target, { immediate: true, force: true })
 
-    reveal()
+    // The curtain only opens on a page ready to be seen, so the heavy work
+    // of showing it (decoding photos, splitting text) never lands on the
+    // opening's frames. Scrolling stays locked until then, so the page
+    // can't move away from where it was prepared.
+    waitForPageReady().then(() => {
+      lenis.start()
+      reveal()
+    })
   }, [page, lenis, scrollPositions])
 
   useEffect(() => {
