@@ -4,6 +4,13 @@
   display: contents;
 }
 
+/* <source> only lists files for the browser to pick from; with the
+   wrapper set to display: contents, it would otherwise join the parent's
+   layout as an empty box and take its own gap. */
+.picture source {
+  display: none;
+}
+
 /* The placeholder, cropped like the photo it stands in for. */
 .picture img {
   background-size: cover;
