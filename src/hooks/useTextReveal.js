@@ -4,6 +4,7 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { createTextReveal } from '../animation/textReveal.js'
 import { siteOpen } from '../animation/siteOpen.js'
 import { isPageShown, whenPageShown } from '../animation/pageShown.js'
+import { whenFontsLoaded } from '../animation/fonts.js'
 
 gsap.registerPlugin(ScrollTrigger)
 
@@ -14,7 +15,7 @@ gsap.registerPlugin(ScrollTrigger)
 // play to another element, for texts that should appear together with it.
 function useTextReveal(scopeRef, { triggerRef, start = 'top 90%' } = {}) {
   useGSAP((context, contextSafe) => {
-    // Split only once the fonts are in (GSAP's advice): splitting with the
+    // Split only once the font is in (see fonts.js): splitting with the
     // fallback font measures lines and kerning that the real font then
     // changes. The texts stay hidden until then (index.css).
     let unmounted = false
@@ -98,7 +99,7 @@ function useTextReveal(scopeRef, { triggerRef, start = 'top 90%' } = {}) {
       })
     })
 
-    document.fonts.ready.then(setUp)
+    whenFontsLoaded().then(setUp)
 
     return () => {
       unmounted = true

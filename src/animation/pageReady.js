@@ -1,3 +1,5 @@
+import { whenFontsLoaded } from './fonts.js'
+
 // Longest wait before showing a page anyway: a stalled photo or a dropped
 // connection must never leave the screen covered.
 const READY_TIMEOUT = 4000
@@ -33,7 +35,7 @@ export async function waitForPageReady({ alsoWaitFor = [] } = {}) {
     })
 
     await Promise.all([
-      document.fonts.ready,
+      whenFontsLoaded(),
       ...images.map((image) => image.decode().catch(() => {})),
       ...alsoWaitFor,
     ])
