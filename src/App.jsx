@@ -11,6 +11,8 @@ import SiteFooter from './components/SiteFooter/SiteFooter.jsx'
 import useTextReveal from './hooks/useTextReveal.js'
 import { createTextReveal } from './animation/textReveal.js'
 import { whenFontsLoaded } from './animation/fonts.js'
+import { whenIdle } from './animation/idle.js'
+import { whenPageShown } from './animation/pageShown.js'
 import './App.css'
 import Picture from './components/Picture/Picture.jsx'
 import images from './assets/images.js'
@@ -86,6 +88,10 @@ function App() {
       scrollTrigger: {
         trigger: pinGalleryRef.current,
         pin: stage,
+        // On a fast scroll the browser may paint a frame past the pin point
+        // before the pin applies, and the stage then jumps back: pinning a
+        // touch early, at the scroll's speed, avoids it (GSAP's remedy).
+        anticipatePin: 1,
         start: 'top top',
         end: '+=1400%',
         scrub: 1.5,
@@ -192,15 +198,20 @@ function App() {
     // rather than the scroll: forward once the playhead passes the end of
     // the morph, the left one first and the right one a beat later, and
     // backwards, both at once, when it goes back past it. They are split,
-    // like every revealed text, only once the font is in.
-    let questionReveals = []
+    // like every revealed text, only once the font is in, and not on the
+    // way in: once the page is shown and the browser idle, or at the
+    // latest when they are due. Hidden until then (App.css).
+    let questionReveals = null
     let unmounted = false
-    whenFontsLoaded().then(
-      contextSafe(() => {
-        if (unmounted) return
+    const prepareQuestions = contextSafe(() => {
+      if (!unmounted && !questionReveals) {
         questionReveals = gsap.utils.toArray('.pin-gallery__question', pinGalleryRef.current).map(createTextReveal)
-      }),
-    )
+      }
+      return questionReveals ?? []
+    })
+    whenFontsLoaded()
+      .then(whenPageShown)
+      .then(() => whenIdle(prepareQuestions))
     let questionsShown = false
     let questionDelays = []
 
@@ -210,10 +221,19 @@ function App() {
 
       questionsShown = shown
       questionDelays.forEach((delay) => delay.kill())
-      questionDelays = shown
-        ? questionReveals.map((reveal, index) => gsap.delayedCall(index * PIN_GALLERY_QUESTION_BEAT, reveal.play))
-        : []
-      if (!shown) questionReveals.forEach((reveal) => reveal.reverse())
+      questionDelays = []
+
+      if (!shown) {
+        questionReveals?.forEach((reveal) => reveal.reverse())
+        return
+      }
+
+      whenFontsLoaded().then(() => {
+        if (!questionsShown) return
+        questionDelays = prepareQuestions().map((reveal, index) =>
+          gsap.delayedCall(index * PIN_GALLERY_QUESTION_BEAT, reveal.play),
+        )
+      })
     })
 
     buildTimeline()
@@ -229,7 +249,7 @@ function App() {
       stageObserver.disconnect()
       lead.removeEventListener('textsplit', buildTimeline)
       questionDelays.forEach((delay) => delay.kill())
-      questionReveals.forEach((reveal) => reveal.kill())
+      questionReveals?.forEach((reveal) => reveal.kill())
     }
   }, { scope: pinGalleryRef })
 

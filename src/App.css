@@ -619,6 +619,15 @@
   color: var(--white);
 }
 
+/* Hidden until their text reveal has split them (App.jsx), so their full
+   text never shows ahead of their moment. Untouched when reduced motion
+   is asked, like every revealed text (index.css). */
+@media (prefers-reduced-motion: no-preference) {
+  .pin-gallery__question {
+    visibility: hidden;
+  }
+}
+
 /* Tablet: 8 columns, and the lead switches to its own fixed text style
    rather than scaling the desktop one. */
 @media (width < 1024px) {

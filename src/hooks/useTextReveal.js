@@ -5,6 +5,7 @@ import { createTextReveal } from '../animation/textReveal.js'
 import { siteOpen } from '../animation/siteOpen.js'
 import { isPageShown, whenPageShown } from '../animation/pageShown.js'
 import { whenFontsLoaded } from '../animation/fonts.js'
+import { whenIdle } from '../animation/idle.js'
 
 gsap.registerPlugin(ScrollTrigger)
 
@@ -74,8 +75,6 @@ function useTextReveal(scopeRef, { triggerRef, start = 'top 90%' } = {}) {
           })
         })
 
-        // Safari has no requestIdleCallback; a short delay stands in for it.
-        const whenIdle = window.requestIdleCallback?.bind(window) ?? ((callback) => setTimeout(callback, 50))
         let stopped = false
 
         // Checked again when idle: the curtain may have started closing

@@ -1,5 +1,6 @@
 import { pictureSizes } from '../components/Picture/pictureSizes.js'
 import { HOME_LEAD_PICTURE, loadArchive } from '../pages.js'
+import { whenIdle } from '../animation/idle.js'
 
 // Preloads the photo through the same AVIF candidates and sizes as its
 // <picture>, so the browser picks, and caches, the very file the page will
@@ -45,7 +46,5 @@ export function startPrefetching() {
   document.addEventListener('pointerover', onIntent, { passive: true })
   document.addEventListener('focusin', onIntent)
 
-  // Safari has no requestIdleCallback; a short delay stands in for it.
-  const whenIdle = window.requestIdleCallback?.bind(window) ?? ((callback) => setTimeout(callback, 2000))
-  whenIdle(() => prefetchPage('/archive'))
+  whenIdle(() => prefetchPage('/archive'), 2000)
 }
