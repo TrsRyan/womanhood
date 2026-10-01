@@ -13,9 +13,15 @@ const LOOP_START = 0.5
 const LOOP_END = 0.5 + 2703017 / 44100
 
 // Seconds.
-const FADE_ENTER = 2
+const FADE_ENTER = 4
 const FADE_TOGGLE = 0.6
 const FADE_HIDDEN = 0.3
+
+// Fades move evenly in decibels, the way hearing perceives loudness, from
+// or down to this level, inaudible: the music rises softly out of silence
+// instead of jumping in, as it does on a straight volume ramp.
+const SILENCE_DB = -60
+const FADE_STEPS = 32
 
 const STORAGE_KEY = 'womanhood-sound'
 
@@ -52,13 +58,24 @@ function getContext() {
   return context
 }
 
-// Fades from wherever the volume is, so a fade cut short by another
-// never jumps.
+// Fades from wherever the volume is, so a fade cut short by another never
+// jumps. The decibel curve is laid out as short straight segments, which
+// a later fade can cancel cleanly in every browser.
 function fadeTo(value, duration) {
   const now = context.currentTime
+  const from = gain.gain.value
+  const toDb = (amplitude) => Math.max(SILENCE_DB, 20 * Math.log10(amplitude))
+  const startDb = toDb(from)
+  const endDb = toDb(value)
+
   gain.gain.cancelScheduledValues(now)
-  gain.gain.setValueAtTime(gain.gain.value, now)
-  gain.gain.linearRampToValueAtTime(value, now + duration)
+  gain.gain.setValueAtTime(from, now)
+
+  for (let step = 1; step <= FADE_STEPS; step++) {
+    const db = startDb + ((endDb - startDb) * step) / FADE_STEPS
+    const amplitude = step === FADE_STEPS ? value : 10 ** (db / 20)
+    gain.gain.linearRampToValueAtTime(amplitude, now + (duration * step) / FADE_STEPS)
+  }
 }
 
 // A suspended context stops the clock too: the music picks up exactly
