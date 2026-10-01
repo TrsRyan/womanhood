@@ -24,8 +24,12 @@
   white-space: nowrap;
 }
 
+/* Wraps within its column, at its only breakable space (the one after ©
+   doesn't break): on one line wherever the column is wide enough, after
+   the year on phones. */
 .enter-screen__credit {
   grid-column: 1;
+  white-space: normal;
 }
 
 .enter-screen__button {
@@ -52,13 +56,4 @@
 
 .enter-screen__count {
   display: inline-block;
-}
-
-/* Phones: the credit breaks after the year, its only breakable space
-   (the one after © doesn't break), at its narrowest width. */
-@media (width < 768px) {
-  .enter-screen__credit {
-    width: min-content;
-    white-space: normal;
-  }
 }

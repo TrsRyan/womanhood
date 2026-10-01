@@ -5,6 +5,7 @@ import { RouterProvider } from 'react-router/dom'
 import Root, { HydrateFallback } from './Root.jsx'
 import './index.css'
 import App from './App.jsx'
+import NotFound from './NotFound.jsx'
 import { loadArchive } from './pages.js'
 
 // One document for the whole site: pages swap in place instead of
@@ -21,6 +22,7 @@ const router = createBrowserRouter([
         path: 'archive',
         lazy: async () => ({ Component: (await loadArchive()).default }),
       },
+      { path: '*', Component: NotFound },
     ],
   },
 ])

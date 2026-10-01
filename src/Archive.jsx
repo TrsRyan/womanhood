@@ -77,7 +77,7 @@ function Archive() {
           <div className="archive__toc">
             <div className="archive__toc-links">
               <a className="archive__toc-link" href="mailto:millelundt@gmail.com"><RollText>millelundt@gmail.com</RollText></a>
-              <a className="archive__toc-link" href="tel:+32497976285"><RollText>+32 497 97 62 85</RollText></a>
+              <a className="archive__toc-link" href="tel:+33639981234"><RollText>+33 6 39 98 12 34</RollText></a>
             </div>
           </div>
 

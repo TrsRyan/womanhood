@@ -83,7 +83,7 @@ function SiteFooter() {
     <footer className="site-footer" ref={footerRef}>
       <div className="site-footer__content" ref={contentRef}>
         <div className="site-footer__legacy">
-          <p data-text-reveal>© 2023 Womanhood</p>
+          <p data-text-reveal>© 2023 WoManHood</p>
           <Link to="/archive" data-text-reveal><RollText>Cookie Preferences</RollText></Link>
           <Link to="/archive" data-text-reveal><RollText>Privacy Policy</RollText></Link>
         </div>

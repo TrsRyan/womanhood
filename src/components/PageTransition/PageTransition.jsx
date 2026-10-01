@@ -30,6 +30,11 @@ const PAGE_TITLES = {
   '/': 'WoManHood',
   '/archive': 'WoManHood — Archive',
 }
+const NOT_FOUND_TITLE = 'WoManHood — Page not found'
+
+// The site's page at this address, trailing slash or not; undefined for
+// one it doesn't have.
+const pageTitle = (pathname) => PAGE_TITLES[pathname.replace(/(.)\/+$/, '$1')]
 
 // Survives reloads, so Back after a reload still returns to where the
 // previous page was left.
@@ -49,7 +54,8 @@ const readScrollPositions = () => {
 // and measured, then the curtain opens. The URL changes first; the page
 // on screen only catches up behind the curtain. A full page load starts
 // with the curtain already closed, under the enter screen: it opens on
-// Enter, once the page is ready.
+// Enter, once the page is ready. An address the site doesn't have shows
+// its 404 at once instead: there is nothing there to prepare or to play.
 function PageTransition() {
   const location = useLocation()
   const navigationType = useNavigationType()
@@ -60,15 +66,16 @@ function PageTransition() {
   const enterScreenRef = useRef(null)
 
   const [page, setPage] = useState(() => ({ outlet, location, navigationType }))
+  const [skipsEntry] = useState(() => pageTitle(location.pathname) === undefined)
   // The site loads behind the closed curtain, under the enter screen.
-  const [curtainClosed, setCurtainClosed] = useState(true)
+  const [curtainClosed, setCurtainClosed] = useState(!skipsEntry)
   // 'loading', 'ready' (Enter can be clicked), 'entered'.
-  const [entry, setEntry] = useState('loading')
+  const [entry, setEntry] = useState(skipsEntry ? 'entered' : 'loading')
   const [scrollPositions] = useState(readScrollPositions)
   // 'entry' (until Enter), 'idle', 'closing', 'closed' (waiting for the
   // URL to commit), 'opening'. A page change asked for during the entry
   // waits for it to end.
-  const phase = useRef('entry')
+  const phase = useRef(skipsEntry ? 'idle' : 'entry')
   const firstPage = useRef(true)
   const latest = useRef({ outlet, location, navigationType })
 
@@ -129,10 +136,15 @@ function PageTransition() {
   // Runs after the new page's own layout effects, so its ScrollTriggers
   // already exist when the page is measured.
   useLayoutEffect(() => {
-    document.title = PAGE_TITLES[page.location.pathname]
+    document.title = pageTitle(page.location.pathname) ?? NOT_FOUND_TITLE
 
     if (firstPage.current) {
       firstPage.current = false
+      if (skipsEntry) {
+        markPageShown()
+        return
+      }
+
       const saved = scrollPositions.get(page.location.key)
       if (saved !== undefined) window.scrollTo(0, saved)
       // Enter starts the music, so it waits for it too, and for every photo
@@ -166,7 +178,7 @@ function PageTransition() {
       lenis.start()
       reveal()
     })
-  }, [page, lenis, scrollPositions])
+  }, [page, lenis, scrollPositions, skipsEntry])
 
   // Until Enter, the page can't be scrolled (Lenis only exists after the
   // first render, hence an effect) nor reached by keyboard or screen
@@ -216,7 +228,7 @@ function PageTransition() {
   return (
     <>
       {shownOutlet}
-      <Curtain ref={curtainRef} startClosed />
+      <Curtain ref={curtainRef} startClosed={!skipsEntry} />
       {entry !== 'entered' && <EnterScreen ref={enterScreenRef} ready={entry === 'ready'} onEnter={enter} />}
     </>
   )
