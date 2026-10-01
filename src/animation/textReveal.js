@@ -58,10 +58,19 @@ const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent)
 // A letter alone in its own box loses the font's kerning. A pair's kerning
 // is the pair's width minus each letter's own width, measured on a hidden
 // copy of the text's font settings, away from the layout (the method of
-// Griffo, a kerning-aware splitting library). Widths are cached: a text
-// repeats few distinct pairs.
-function createKerningMeter(styleSource) {
+// Griffo, a kerning-aware splitting library). One meter per text style,
+// kept for the whole visit with its widths: texts set alike share their
+// measurements, and the same pairs come back across every text.
+const kerningMeters = new Map()
+
+function getKerningMeter(styleSource) {
   const styles = getComputedStyle(styleSource)
+  const key = TEXT_METRIC_STYLES.map((property) => styles.getPropertyValue(property)).join('|')
+  if (!kerningMeters.has(key)) kerningMeters.set(key, createKerningMeter(styles))
+  return kerningMeters.get(key)
+}
+
+function createKerningMeter(styles) {
   const meter = document.createElement('span')
   TEXT_METRIC_STYLES.forEach((property) => meter.style.setProperty(property, styles.getPropertyValue(property)))
   meter.style.cssText += 'position:fixed;left:0;top:0;visibility:hidden;pointer-events:none;white-space:pre;'
@@ -85,7 +94,6 @@ function createKerningMeter(styleSource) {
   return {
     fontSize: parseFloat(styles.fontSize),
     kerning: (...parts) => width(parts.join('')) - parts.reduce((sum, part) => sum + width(part), 0),
-    remove: () => meter.remove(),
   }
 }
 
@@ -95,7 +103,7 @@ function createKerningMeter(styleSource) {
 // measuring first, then all writing.
 function restoreKerning(lines, words) {
   if (!words.length) return
-  const meter = createKerningMeter(words[0])
+  const meter = getKerningMeter(words[0])
   const margins = new Map()
 
   words.forEach((word, index) => {
@@ -109,7 +117,6 @@ function restoreKerning(lines, words) {
       margins.set(letters[0], meter.kerning(previous.lastElementChild.textContent, ' ', letters[0].textContent))
     }
   })
-  meter.remove()
 
   margins.forEach((kerning, letter) => {
     if (Math.abs(kerning) > 1e-3) letter.style.marginLeft = `${kerning / meter.fontSize}em`

@@ -17,7 +17,11 @@ function SmoothScroll({ children }) {
   useEffect(() => {
     const update = (time) => lenisRef.current?.lenis?.raf(time * 1000)
 
-    gsap.ticker.add(update)
+    // Prioritized: Lenis reads and sets the scroll at the very start of
+    // each frame, before GSAP renders. After it, reading the scroll would
+    // force the browser to lay out the page GSAP has just changed, on
+    // every frame of a scroll.
+    gsap.ticker.add(update, false, true)
     gsap.ticker.lagSmoothing(0)
 
     return () => {

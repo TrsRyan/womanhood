@@ -7,6 +7,7 @@ import Curtain from '../Curtain/Curtain.jsx'
 import EnterScreen from '../EnterScreen/EnterScreen.jsx'
 import { waitForPageReady } from '../../animation/pageReady.js'
 import { openSite } from '../../animation/siteOpen.js'
+import { markPageHidden, markPageShown } from '../../animation/pageShown.js'
 import { enterSoundtrack, isSoundEnabled, loadSoundtrack } from '../../audio/soundtrack.js'
 import { startPrefetching } from '../../navigation/prefetch.js'
 
@@ -78,6 +79,7 @@ function PageTransition() {
     phase.current = 'closing'
     scrollPositions.set(page.location.key, window.scrollY)
     lenis?.stop()
+    markPageHidden()
     curtainRef.current.close().then(() => {
       phase.current = 'closed'
       setCurtainClosed(true)
@@ -86,6 +88,7 @@ function PageTransition() {
 
   const reveal = async () => {
     await curtainRef.current.open()
+    markPageShown()
     phase.current = 'idle'
     setCurtainClosed(false)
   }
