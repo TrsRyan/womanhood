@@ -168,19 +168,25 @@ function App() {
       // The lead fills in word by word, karaoke style, and is fully black
       // by the time the last image starts rising towards it. Linear ease,
       // so the fill tracks the scroll exactly.
+      // Until the lead is split there are no words yet: the fill is left
+      // out, and the rebuild its split triggers adds it. It ends before the
+      // last image, so leaving it out moves nothing else in the timeline.
       const lastImageStart = (images.length - 1) * (imageLifetime - PIN_GALLERY_OVERLAP)
+      const leadWords = gsap.utils.toArray('.text-reveal__word', lead)
 
-      pinGalleryTimeline.fromTo(
-        gsap.utils.toArray('.text-reveal__word', lead),
-        { color: leadGray },
-        {
-          color: leadBlack,
-          ease: 'none',
-          duration: PIN_GALLERY_WORD_FILL,
-          stagger: { amount: lastImageStart - PIN_GALLERY_WORD_FILL },
-        },
-        0,
-      )
+      if (leadWords.length) {
+        pinGalleryTimeline.fromTo(
+          leadWords,
+          { color: leadGray },
+          {
+            color: leadBlack,
+            ease: 'none',
+            duration: PIN_GALLERY_WORD_FILL,
+            stagger: { amount: lastImageStart - PIN_GALLERY_WORD_FILL },
+          },
+          0,
+        )
+      }
 
       // Marks the end of the morph: the questions reveal once the playhead
       // (not the scroll, which the scrub lags behind) passes it.
