@@ -9,7 +9,7 @@ gsap.registerPlugin(ScrollTrigger)
 // autoAlpha also hides the image while it is transparent, so the browser
 // doesn't draw it for nothing.
 const IMAGE_REVEAL_FROM = { autoAlpha: 0 }
-const IMAGE_REVEAL_TO = { autoAlpha: 1, ease: 'power1.out', duration: 0.9 }
+const IMAGE_REVEAL_TO = { autoAlpha: 1, ease: 'power2.out', duration: 0.9 }
 // Images reaching the screen together (side by side) follow one another
 // by this much, in page order, instead of appearing as one.
 const IMAGE_REVEAL_STAGGER = 0.15
