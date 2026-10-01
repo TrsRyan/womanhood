@@ -75,6 +75,7 @@ function createKerningMeter(styles) {
   TEXT_METRIC_STYLES.forEach((property) => meter.style.setProperty(property, styles.getPropertyValue(property)))
   meter.style.cssText += 'position:fixed;left:0;top:0;visibility:hidden;pointer-events:none;white-space:pre;'
   document.body.append(meter)
+  console.log('[kerning] meter created', Math.round(performance.now()) + 'ms', 'font loaded:', document.fonts.check('1em "Geist Variable"'), 'fonts status:', document.fonts.status, 'size:', styles.fontSize)
 
   const range = document.createRange()
   const widths = new Map()
@@ -93,7 +94,13 @@ function createKerningMeter(styles) {
 
   return {
     fontSize: parseFloat(styles.fontSize),
-    kerning: (...parts) => width(parts.join('')) - parts.reduce((sum, part) => sum + width(part), 0),
+    kerning: (...parts) => {
+      const kerning = width(parts.join('')) - parts.reduce((sum, part) => sum + width(part), 0)
+      if (Math.abs(kerning / parseFloat(styles.fontSize)) > 0.08) {
+        console.log('[kerning] odd pair', JSON.stringify(parts.join('')), 'kerning px:', kerning.toFixed(2), 'widths:', parts.map((part) => `${JSON.stringify(part)}=${width(part).toFixed(2)}`).join(' '), 'whole:', width(parts.join('')).toFixed(2), 'at', Math.round(performance.now()) + 'ms', 'font loaded now:', document.fonts.check('1em "Geist Variable"'))
+      }
+      return kerning
+    },
   }
 }
 
