@@ -1,14 +1,15 @@
-import { useRef } from 'react'
+import { useEffect, useRef } from 'react'
 import { Link } from 'react-router'
 import { useGSAP } from '@gsap/react'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { Flip } from 'gsap/Flip'
-import { SplitText } from 'gsap/SplitText'
 import GridOverlay from './components/GridOverlay/GridOverlay.jsx'
 import SiteHeader from './components/SiteHeader/SiteHeader.jsx'
 import RollText from './components/RollText/RollText.jsx'
 import SiteFooter from './components/SiteFooter/SiteFooter.jsx'
+import useTextReveal from './hooks/useTextReveal.js'
+import { createTextReveal } from './animation/textReveal.js'
 import './App.css'
 import transitionImage from './assets/transition-image.jpg'
 import introPrimary from './assets/intro-primary.jpg'
@@ -33,17 +34,24 @@ const PIN_GALLERY_EASE = 'power1.inOut'
 const PIN_GALLERY_END_HOLD = 1
 // How long each word of the lead takes to turn from gray to black.
 const PIN_GALLERY_WORD_FILL = 0.3
+// Seconds between the left question's reveal and the right one's.
+const PIN_GALLERY_QUESTION_BEAT = 0.25
 // End state of the last image's morph, defined in App.css.
 const FULLSCREEN_CLASS = 'pin-gallery__item--fullscreen'
 
-gsap.registerPlugin(ScrollTrigger, Flip, SplitText)
+gsap.registerPlugin(ScrollTrigger, Flip)
 
 function App() {
+  const mainRef = useRef(null)
   const transitionImageRef = useRef(null)
   const heroRef = useRef(null)
   const transitionSpacerRef = useRef(null)
+  const narrativeHeaderRef = useRef(null)
+  const narrativeContentRef = useRef(null)
   const pinGalleryRef = useRef(null)
   const pinGalleryStageRef = useRef(null)
+
+  useTextReveal(mainRef)
 
   useGSAP(() => {
     // One timeline over the hero + spacer window: the parallax (yPercent)
@@ -100,12 +108,13 @@ function App() {
     // triggers a rebuild mid-scroll.
     let measuredSize = ''
 
-    // Words don't depend on line breaks, so unlike the questions the lead
-    // is split once, without autoSplit. The gray and black come from the
-    // site's tokens rather than being repeated here; the lead's own CSS
-    // color stays black, so the text still reads if the script never runs.
+    // The lead is split by its scroll reveal (useTextReveal), once the
+    // fonts are in: its words are read at each build, and every split
+    // fires `textsplit`, which rebuilds the timeline onto them. The gray
+    // and black come from the site's tokens rather than being repeated
+    // here; the lead's own CSS color stays black, so the text still reads
+    // if the script never runs.
     const lead = pinGalleryRef.current.querySelector('.pin-gallery__lead')
-    const leadWords = SplitText.create(lead, { type: 'words' }).words
     const leadGray = getComputedStyle(document.documentElement).getPropertyValue('--gray-text').trim()
     const leadBlack = getComputedStyle(lead).color
 
@@ -159,7 +168,7 @@ function App() {
       const lastImageStart = (images.length - 1) * (imageLifetime - PIN_GALLERY_OVERLAP)
 
       pinGalleryTimeline.fromTo(
-        leadWords,
+        gsap.utils.toArray('.text-reveal__word', lead),
         { color: leadGray },
         {
           color: leadBlack,
@@ -182,42 +191,24 @@ function App() {
       pinGalleryTimeline.time(0).time(time)
     })
 
-    // The questions play on their own clock rather than the scroll. autoSplit
-    // re-splits them once fonts load and whenever their width changes;
-    // returning the reveal from onSplit lets SplitText swap it for one on
-    // the new lines at the same progress.
-    let questionsReveal
+    // The questions get the site's text reveal, played on their own clock
+    // rather than the scroll: forward once the playhead passes the end of
+    // the morph, the left one first and the right one a beat later, and
+    // backwards, both at once, when it goes back past it.
+    const questionReveals = gsap.utils.toArray('.pin-gallery__question', pinGalleryRef.current).map(createTextReveal)
     let questionsShown = false
-
-    const questions = gsap.utils.toArray('.pin-gallery__question', pinGalleryRef.current)
-
-    SplitText.create(questions, {
-      type: 'lines',
-      mask: 'lines',
-      autoSplit: true,
-      onSplit: (split) => {
-        // Left question first, the right one a beat later; within each
-        // question, its lines follow one another.
-        questionsReveal = gsap.timeline({ paused: true })
-        questions.forEach((question, index) => {
-          questionsReveal.fromTo(
-            split.lines.filter((line) => question.contains(line)),
-            { yPercent: 100 },
-            { yPercent: 0, ease: 'power3.out', duration: 1.2, stagger: 0.08 },
-            index * 0.25,
-          )
-        })
-        return questionsReveal
-      },
-    })
+    let questionDelays = []
 
     pinGalleryTimeline.eventCallback('onUpdate', () => {
       const shown = pinGalleryTimeline.time() >= pinGalleryTimeline.labels.questions
       if (shown === questionsShown) return
 
       questionsShown = shown
-      if (shown) questionsReveal.play()
-      else questionsReveal.reverse()
+      questionDelays.forEach((delay) => delay.kill())
+      questionDelays = shown
+        ? questionReveals.map((reveal, index) => gsap.delayedCall(index * PIN_GALLERY_QUESTION_BEAT, reveal.play))
+        : []
+      if (!shown) questionReveals.forEach((reveal) => reveal.reverse())
     })
 
     buildTimeline()
@@ -226,9 +217,27 @@ function App() {
       if (stageSize() !== measuredSize) buildTimeline()
     })
     stageObserver.observe(stage)
+    lead.addEventListener('textsplit', buildTimeline)
 
-    return () => stageObserver.disconnect()
+    return () => {
+      stageObserver.disconnect()
+      lead.removeEventListener('textsplit', buildTimeline)
+      questionDelays.forEach((delay) => delay.kill())
+      questionReveals.forEach((reveal) => reveal.kill())
+    }
   }, { scope: pinGalleryRef })
+
+  // CSS has no access to the content's rendered height, which changes with
+  // the line count; .narrative__header needs it to end its sticky travel.
+  useEffect(() => {
+    const header = narrativeHeaderRef.current
+    const contentObserver = new ResizeObserver(([entry]) => {
+      header.style.setProperty('--narrative-content-height', `${entry.borderBoxSize[0].blockSize}px`)
+    })
+    contentObserver.observe(narrativeContentRef.current)
+
+    return () => contentObserver.disconnect()
+  }, [])
 
   return (
     <>
@@ -236,7 +245,7 @@ function App() {
 
       <SiteHeader />
 
-      <main>
+      <main ref={mainRef}>
         <div className="transition-scene">
           <div className="transition-image__backdrop" aria-hidden="true" />
 
@@ -244,7 +253,7 @@ function App() {
 
           <section className="hero" ref={heroRef}>
             <div className="hero__tagline-row">
-              <p className="hero__tagline">
+              <p className="hero__tagline" data-text-reveal>
                 Three female characters searching for the fine line between Man and Woman. Blending fiction and reality, circus arts, music, and documentary.
               </p>
             </div>
@@ -262,15 +271,15 @@ function App() {
             <div className="intro__media">
               <img className="intro__image intro__image--primary" src={introPrimary} alt="" />
               <img className="intro__image intro__image--secondary" src={introSecondary} alt="" />
-              <p className="intro__copyright">©2023</p>
+              <p className="intro__copyright" data-text-reveal>©2023</p>
             </div>
 
             <div className="intro__text">
-              <p className="intro__index-label">(01)</p>
-              <p className="intro__paragraph intro__paragraph--first">
+              <p className="intro__index-label" data-text-reveal>(01)</p>
+              <p className="intro__paragraph intro__paragraph--first" data-text-reveal>
                 WoManHood starts from something real. In the mountains of northern Albania, a family left without sons could turn to a daughter. She swore an oath of virginity and lived as a man from then on.
               </p>
-              <p className="intro__paragraph intro__paragraph--second">
+              <p className="intro__paragraph intro__paragraph--second" data-text-reveal>
                 They are called Burnesha, from the Albanian for &quot;like a man&quot;, and are often described as the last women in Europe to live as men. The tradition is fading. The inequality that produced it has not.
               </p>
             </div>
@@ -279,31 +288,33 @@ function App() {
           <section className="narrative">
             <img className="narrative__background" src={narrativeBackground} alt="" width={2731} height={4096} />
 
-            <div className="narrative__header">
-              <p className="narrative__index-label">(02)</p>
-              <p className="narrative__title">From real life to the imaginary</p>
-              <p className="narrative__description">
-                A black box, almost no set. Aerial chain, contortion, live voice, autoharp and electronic effects play against documentary footage projected onto the stage, until it is no longer clear what is filmed and what is live.
-              </p>
+            <div className="narrative__header" ref={narrativeHeaderRef}>
+              <div className="narrative__content" ref={narrativeContentRef}>
+                <p className="narrative__index-label" data-text-reveal>(02)</p>
+                <p className="narrative__title" data-text-reveal>From real life to the imaginary</p>
+                <p className="narrative__description" data-text-reveal>
+                  A black box, almost no set. Aerial chain, contortion, live voice, autoharp and electronic effects play against documentary footage projected onto the stage, until it is no longer clear what is filmed and what is live.
+                </p>
+              </div>
             </div>
           </section>
 
           <section className="documentary">
-            <p className="documentary__index-label">(03)</p>
+            <p className="documentary__index-label" data-text-reveal>(03)</p>
 
             <img className="documentary__image documentary__image--cover" src={documentaryCover} alt="" />
 
-            <p className="documentary__note">
+            <p className="documentary__note" data-text-reveal>
               Sound, spoken word, live interviews. Everything was gathered on location.
             </p>
 
-            <p className="documentary__caption">Documentary, Albania</p>
+            <p className="documentary__caption" data-text-reveal>Documentary, Albania</p>
 
             <div className="documentary__quote">
-              <p className="documentary__quote-text">
+              <p className="documentary__quote-text" data-text-reveal>
                 In 2014, while researching masculinity for the stage, Mille Lundt came across photographs of the Burnesha and never let the subject go. Years later the company went to find them: one in the northern mountains, another by the sea in Durrës.
               </p>
-              <Link className="documentary__quote-link" to="/archive"><RollText underline>Read The Story</RollText></Link>
+              <Link className="documentary__quote-link" to="/archive" data-text-reveal><RollText underline>Read The Story</RollText></Link>
             </div>
 
             <img className="documentary__image documentary__image--feature" src={documentaryFeature} alt="" />
@@ -318,7 +329,7 @@ function App() {
               nested in the one being resized. */}
           <section className="pin-gallery" ref={pinGalleryRef}>
             <div className="pin-gallery__stage" ref={pinGalleryStageRef}>
-              <p className="pin-gallery__lead">
+              <p className="pin-gallery__lead" data-text-reveal>
                 Combining performance, circus arts, visual art, sound, and photography to push artistic boundaries.
               </p>
 

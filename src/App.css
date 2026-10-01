@@ -315,13 +315,22 @@
   position: sticky;
   top: 0;
   height: 100svh;
-  align-content: center;
   padding: var(--spacing-10);
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  align-content: center;
+  /* Sticky stops at the margin box, so a negative margin lets the band's
+     empty lower half hang past the image: the content itself, not the
+     band, then ends its travel on the image's bottom padding. Measured
+     in App.jsx; until then the calc is invalid and the margin stays 0. */
+  margin-bottom: calc(var(--narrative-content-height) / 2 + var(--spacing-10) - 50svh);
   color: var(--white);
   /* Stays readable over both light and dark areas of the image. */
   mix-blend-mode: exclusion;
+}
+
+.narrative__content {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
 }
 
 .narrative__index-label {
@@ -366,12 +375,16 @@
     position: static;
     height: auto;
     padding: 0;
+    margin-bottom: 0;
+    color: var(--black);
+    mix-blend-mode: normal;
+  }
+
+  .narrative__content {
     display: flex;
     flex-direction: column;
     align-items: flex-start;
     gap: var(--gutter);
-    color: var(--black);
-    mix-blend-mode: normal;
   }
 
   /* Flex items shrink to their content without an explicit width,

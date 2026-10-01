@@ -17,7 +17,8 @@ const ROLL_STAGGER = 0.01
 // copy rising from below. It only plays on the way in: once the copy has
 // taken over, both snap back unseen (the two are identical), so every
 // hover rolls upward again. A hover while it plays is ignored rather than
-// restarting it mid-roll. Mouse only, and off when reduced motion is asked.
+// restarting it mid-roll. The roll is mouse only, and off when reduced
+// motion is asked.
 // With `underline`, a line under the label wipes out to the right and back
 // in from the left during the roll.
 function RollText({ children, underline = false }) {
@@ -27,11 +28,13 @@ function RollText({ children, underline = false }) {
   const underlineRef = useRef(null)
 
   useGSAP(() => {
+    // Split on every device, not only for the hover: useTextReveal reveals
+    // these same letters (found by their class) when the label scrolls in.
+    const originalChars = SplitText.create(originalRef.current, { type: 'chars', charsClass: 'roll-text__char' }).chars
     const mm = gsap.matchMedia()
 
     mm.add('(hover: hover) and (prefers-reduced-motion: no-preference)', () => {
       const root = rootRef.current
-      const originalChars = SplitText.create(originalRef.current, { type: 'chars' }).chars
       const copyChars = SplitText.create(copyRef.current, { type: 'chars' }).chars
 
       // The copy's box already sits one line lower (RollText.css), so both
@@ -55,9 +58,12 @@ function RollText({ children, underline = false }) {
       }
 
       // A link marking where the reader already is (aria-current) reads as
-      // a position, not an invitation, so it doesn't roll.
+      // a position, not an invitation, so it doesn't roll. A label with a
+      // scroll reveal waits for it to finish (data-text-revealed), since
+      // both move the same letters.
       const onEnter = () => {
-        if (root.closest('[aria-current]') || roll.isActive()) return
+        const revealing = root.closest('[data-text-reveal]:not([data-text-revealed])')
+        if (root.closest('[aria-current]') || revealing || roll.isActive()) return
         roll.restart()
       }
 

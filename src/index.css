@@ -123,6 +123,24 @@ a {
   color: inherit;
 }
 
+/* Hidden until createTextReveal has split the text and parked its letters
+   below their lines, so the full text never flashes before the reveal.
+   Untouched when reduced motion is asked, since nothing animates then. */
+@media (prefers-reduced-motion: no-preference) {
+  [data-text-reveal] {
+    visibility: hidden;
+  }
+}
+
+/* text-indent is inherited, so every line, word and letter the split
+   creates would start with its own indent. Words drop it from the moment
+   they exist, before SplitText measures them to build the lines (their
+   letters inherit the 0); only the first line keeps it. */
+.text-reveal__word,
+.text-reveal__line-mask:not(:first-child) {
+  text-indent: 0;
+}
+
 /* Standard visually-hidden pattern: present for screen readers, invisible
    and zero-footprint for everyone else. */
 .sr-only {

@@ -6,6 +6,7 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import transitionImage from '../../assets/transition-image.jpg'
 import { WORDMARK_HEIGHT, WORDMARK_LETTERS, WORDMARK_WIDTH } from './wordmark-letters.js'
 import RollText from '../RollText/RollText.jsx'
+import useTextReveal from '../../hooks/useTextReveal.js'
 import './SiteFooter.css'
 
 gsap.registerPlugin(ScrollTrigger)
@@ -71,13 +72,18 @@ function SiteFooter() {
     })
   }, { scope: footerRef })
 
+  // Played on the footer's own uncovering, not on the texts' positions:
+  // they sit at its top, under the page until the very end. Starting at
+  // 90% uncovered, the wave is still running as the page clears them.
+  useTextReveal(footerRef, { triggerRef: footerRef, start: 'bottom-=10% bottom' })
+
   return (
     <footer className="site-footer" ref={footerRef}>
       <div className="site-footer__content" ref={contentRef}>
         <div className="site-footer__legacy">
-          <p>© 2023 Womanhood</p>
-          <Link to="/archive"><RollText>Cookie Preferences</RollText></Link>
-          <Link to="/archive"><RollText>Privacy Policy</RollText></Link>
+          <p data-text-reveal>© 2023 Womanhood</p>
+          <Link to="/archive" data-text-reveal><RollText>Cookie Preferences</RollText></Link>
+          <Link to="/archive" data-text-reveal><RollText>Privacy Policy</RollText></Link>
         </div>
 
         {/* Each letter is drawn twice: filled with the photo, then in black
