@@ -13,11 +13,10 @@ import { createTextReveal } from './animation/textReveal.js'
 import './App.css'
 import Picture from './components/Picture/Picture.jsx'
 import images from './assets/images.js'
+import { HOME_LEAD_PICTURE } from './pages.js'
 
 // The 3:4 frames most photos are cropped to (aspect-ratio in App.css).
 const PORTRAIT_FRAME = 3 / 4
-// Largest zoom the transition image's timeline reaches (below).
-const TRANSITION_IMAGE_MAX_SCALE = 1.22
 
 // Pin-gallery timeline rhythm, in timeline units (one image entry = 1).
 const PIN_GALLERY_HOLD = 0.1
@@ -69,7 +68,7 @@ function App() {
 
     transitionImageTimeline
       .fromTo(transitionImageRef.current, { yPercent: 8 }, { yPercent: -8, ease: 'none', duration: 1 }, 0)
-      .fromTo(transitionImageRef.current, { scale: TRANSITION_IMAGE_MAX_SCALE }, { scale: 1.18, ease: 'none', duration: 0.4 }, 0.8)
+      .fromTo(transitionImageRef.current, { scale: HOME_LEAD_PICTURE.scale }, { scale: 1.18, ease: 'none', duration: 0.4 }, 0.8)
       .fromTo(transitionImageRef.current, { autoAlpha: 1 }, { autoAlpha: 0, ease: 'none', duration: 0.4 }, 0.8)
   })
 
@@ -246,14 +245,7 @@ function App() {
         <div className="transition-scene">
           <div className="transition-image__backdrop" aria-hidden="true" />
 
-          <Picture
-            className="transition-image__img"
-            image={images['transition-image']}
-            sizes="viewport"
-            scale={TRANSITION_IMAGE_MAX_SCALE}
-            priority
-            ref={transitionImageRef}
-          />
+          <Picture className="transition-image__img" {...HOME_LEAD_PICTURE} priority ref={transitionImageRef} />
 
           <section className="hero" ref={heroRef}>
             <div className="hero__tagline-row">

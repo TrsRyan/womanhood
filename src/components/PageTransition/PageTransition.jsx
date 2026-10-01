@@ -8,6 +8,7 @@ import EnterScreen from '../EnterScreen/EnterScreen.jsx'
 import { waitForPageReady } from '../../animation/pageReady.js'
 import { openSite } from '../../animation/siteOpen.js'
 import { enterSoundtrack, isSoundEnabled, loadSoundtrack } from '../../audio/soundtrack.js'
+import { startPrefetching } from '../../navigation/prefetch.js'
 
 gsap.registerPlugin(ScrollTrigger)
 
@@ -167,6 +168,7 @@ function PageTransition() {
   const enter = () => {
     enterSoundtrack()
     setEntry('entered')
+    startPrefetching()
     openSite()
     lenis?.start()
     reveal()
