@@ -12,7 +12,7 @@ const IMAGE_REVEAL_FROM = { autoAlpha: 0 }
 const IMAGE_REVEAL_TO = { autoAlpha: 1, ease: 'power2.out', duration: 0.9 }
 // Images reaching the screen together (side by side) follow one another
 // by this much, in page order, instead of appearing as one.
-const IMAGE_REVEAL_STAGGER = 0.15
+const IMAGE_REVEAL_STAGGER = 0.08
 
 // Fades in every [data-image-reveal] image inside `scopeRef` on the same
 // beat as the texts: once its top reaches 90% of the screen. It resets
