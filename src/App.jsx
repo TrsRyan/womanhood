@@ -11,16 +11,13 @@ import SiteFooter from './components/SiteFooter/SiteFooter.jsx'
 import useTextReveal from './hooks/useTextReveal.js'
 import { createTextReveal } from './animation/textReveal.js'
 import './App.css'
-import transitionImage from './assets/transition-image.jpg'
-import introPrimary from './assets/intro-primary.jpg'
-import introSecondary from './assets/intro-secondary.jpg'
-import narrativeBackground from './assets/narrative-background.jpg'
-import documentaryCover from './assets/documentary-cover.png'
-import documentaryFeature from './assets/documentary-feature.png'
-import pinGallery1 from './assets/pin-gallery-1.jpg'
-import pinGallery2 from './assets/pin-gallery-2.png'
-import pinGallery3 from './assets/pin-gallery-3.jpg'
-import pinGallery4 from './assets/pin-gallery-4.jpg'
+import Picture from './components/Picture/Picture.jsx'
+import images from './assets/images.js'
+
+// The 3:4 frames most photos are cropped to (aspect-ratio in App.css).
+const PORTRAIT_FRAME = 3 / 4
+// Largest zoom the transition image's timeline reaches (below).
+const TRANSITION_IMAGE_MAX_SCALE = 1.22
 
 // Pin-gallery timeline rhythm, in timeline units (one image entry = 1).
 const PIN_GALLERY_HOLD = 0.1
@@ -72,7 +69,7 @@ function App() {
 
     transitionImageTimeline
       .fromTo(transitionImageRef.current, { yPercent: 8 }, { yPercent: -8, ease: 'none', duration: 1 }, 0)
-      .fromTo(transitionImageRef.current, { scale: 1.22 }, { scale: 1.18, ease: 'none', duration: 0.4 }, 0.8)
+      .fromTo(transitionImageRef.current, { scale: TRANSITION_IMAGE_MAX_SCALE }, { scale: 1.18, ease: 'none', duration: 0.4 }, 0.8)
       .fromTo(transitionImageRef.current, { autoAlpha: 1 }, { autoAlpha: 0, ease: 'none', duration: 0.4 }, 0.8)
   })
 
@@ -249,7 +246,14 @@ function App() {
         <div className="transition-scene">
           <div className="transition-image__backdrop" aria-hidden="true" />
 
-          <img className="transition-image__img" src={transitionImage} alt="" ref={transitionImageRef} />
+          <Picture
+            className="transition-image__img"
+            image={images['transition-image']}
+            sizes="viewport"
+            scale={TRANSITION_IMAGE_MAX_SCALE}
+            priority
+            ref={transitionImageRef}
+          />
 
           <section className="hero" ref={heroRef}>
             <div className="hero__tagline-row">
@@ -269,8 +273,18 @@ function App() {
         <div className="page-content">
           <section className="intro">
             <div className="intro__media">
-              <img className="intro__image intro__image--primary" src={introPrimary} alt="" />
-              <img className="intro__image intro__image--secondary" src={introSecondary} alt="" />
+              <Picture
+                className="intro__image intro__image--primary"
+                image={images['intro-primary']}
+                sizes={{ mobile: 100, tablet: 50, desktop: 34 }}
+                frameRatio={PORTRAIT_FRAME}
+              />
+              <Picture
+                className="intro__image intro__image--secondary"
+                image={images['intro-secondary']}
+                sizes={{ mobile: 50, tablet: 25, desktop: 17 }}
+                frameRatio={PORTRAIT_FRAME}
+              />
               <p className="intro__copyright" data-text-reveal>©2023</p>
             </div>
 
@@ -286,7 +300,11 @@ function App() {
           </section>
 
           <section className="narrative">
-            <img className="narrative__background" src={narrativeBackground} alt="" width={2731} height={4096} />
+            <Picture
+              className="narrative__background"
+              image={images['narrative-background']}
+              sizes={{ mobile: 100, tablet: 100, desktop: 100 }}
+            />
 
             <div className="narrative__header" ref={narrativeHeaderRef}>
               <div className="narrative__content" ref={narrativeContentRef}>
@@ -302,7 +320,12 @@ function App() {
           <section className="documentary">
             <p className="documentary__index-label" data-text-reveal>(03)</p>
 
-            <img className="documentary__image documentary__image--cover" src={documentaryCover} alt="" />
+            <Picture
+              className="documentary__image documentary__image--cover"
+              image={images['documentary-cover']}
+              sizes={{ mobile: 50, tablet: 17, desktop: 17 }}
+              frameRatio={PORTRAIT_FRAME}
+            />
 
             <p className="documentary__note" data-text-reveal>
               Sound, spoken word, live interviews. Everything was gathered on location.
@@ -317,7 +340,12 @@ function App() {
               <Link className="documentary__quote-link" to="/archive" data-text-reveal><RollText underline>Read The Story</RollText></Link>
             </div>
 
-            <img className="documentary__image documentary__image--feature" src={documentaryFeature} alt="" />
+            <Picture
+              className="documentary__image documentary__image--feature"
+              image={images['documentary-feature']}
+              sizes={{ mobile: 100, tablet: 25, desktop: 34 }}
+              frameRatio={PORTRAIT_FRAME}
+            />
           </section>
 
           {/* .pin-gallery__stage is the pinned element. The 4 items share
@@ -334,17 +362,22 @@ function App() {
               </p>
 
               <div className="pin-gallery__images">
-                <figure className="pin-gallery__item pin-gallery__item--1">
-                  <img className="pin-gallery__image" src={pinGallery1} alt="" />
-                </figure>
-                <figure className="pin-gallery__item pin-gallery__item--2">
-                  <img className="pin-gallery__image" src={pinGallery2} alt="" />
-                </figure>
-                <figure className="pin-gallery__item pin-gallery__item--3">
-                  <img className="pin-gallery__image" src={pinGallery3} alt="" />
-                </figure>
+                {/* Eager: they start at scale 0, an empty box that lazy
+                    loading would never see entering the screen. The last
+                    one ends up covering the whole stage. */}
+                {['pin-gallery-1', 'pin-gallery-2', 'pin-gallery-3'].map((name, index) => (
+                  <figure key={name} className={`pin-gallery__item pin-gallery__item--${index + 1}`}>
+                    <Picture
+                      className="pin-gallery__image"
+                      image={images[name]}
+                      sizes={{ mobile: 50, tablet: 25, desktop: 17 }}
+                      frameRatio={PORTRAIT_FRAME}
+                      eager
+                    />
+                  </figure>
+                ))}
                 <figure className="pin-gallery__item pin-gallery__item--4">
-                  <img className="pin-gallery__image" src={pinGallery4} alt="" />
+                  <Picture className="pin-gallery__image" image={images['pin-gallery-4']} sizes="viewport" eager />
                 </figure>
               </div>
 

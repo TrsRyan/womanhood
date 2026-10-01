@@ -3,7 +3,9 @@ import { Link } from 'react-router'
 import { useGSAP } from '@gsap/react'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
-import transitionImage from '../../assets/transition-image.jpg'
+// An SVG <image> takes a single file, no srcset: one WebP wide enough for
+// the wordmark's full width on a high-density screen.
+import transitionImage from '../../assets/transition-image.jpg?w=2560&format=webp'
 import { WORDMARK_HEIGHT, WORDMARK_LETTERS, WORDMARK_WIDTH } from './wordmark-letters.js'
 import RollText from '../RollText/RollText.jsx'
 import useTextReveal from '../../hooks/useTextReveal.js'

@@ -1,0 +1,12 @@
+/* The wrapper only offers the browser its formats: it generates no box,
+   so the <img> keeps its place in grids, flex rows and fixed layers. */
+.picture {
+  display: contents;
+}
+
+/* The placeholder, cropped like the photo it stands in for. */
+.picture img {
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
