@@ -1,14 +1,19 @@
 import { useEffect, useRef } from 'react'
 import { createPortal } from 'react-dom'
+import useSound from '../../hooks/useSound.js'
+import RollText from '../RollText/RollText.jsx'
 import './EnterScreen.css'
 
 // Shown over the closed curtain on every full page load: "Loading" while
-// the page is prepared behind it, then an "Enter" button. The click is
-// also the gesture browsers require before a site may play sound.
-// Rendered outside #root, which is inert meanwhile, so the button is the
-// only thing focusable.
+// the page is prepared behind it, then an "Enter" button. Next to it, the
+// sound setting the visit will start with, stated before anything plays
+// and switchable here: the same setting as the header's. The click on
+// Enter is also the gesture browsers require before a site may play
+// sound. Rendered outside #root, which is inert meanwhile, so these are
+// the only focusable controls.
 function EnterScreen({ ready, onEnter }) {
   const buttonRef = useRef(null)
+  const [soundOn, toggleSound] = useSound()
 
   useEffect(() => {
     if (ready) buttonRef.current.focus()
@@ -23,7 +28,11 @@ function EnterScreen({ ready, onEnter }) {
         disabled={!ready}
         onClick={onEnter}
       >
-        {ready ? 'Enter' : 'Loading'}
+        {ready ? <RollText>Enter</RollText> : 'Loading'}
+      </button>
+      {/* Keyed by the label, so the letter roll re-splits the new text. */}
+      <button type="button" className="enter-screen__sound" onClick={toggleSound}>
+        <RollText key={soundOn ? 'on' : 'off'}>{soundOn ? '(Sound On)' : '(Sound Off)'}</RollText>
       </button>
     </div>,
     document.body,

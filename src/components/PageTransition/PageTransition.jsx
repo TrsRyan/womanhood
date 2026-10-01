@@ -7,6 +7,7 @@ import Curtain from '../Curtain/Curtain.jsx'
 import EnterScreen from '../EnterScreen/EnterScreen.jsx'
 import { waitForPageReady } from '../../animation/pageReady.js'
 import { openSite } from '../../animation/siteOpen.js'
+import { enterSoundtrack, isSoundEnabled, loadSoundtrack } from '../../audio/soundtrack.js'
 
 gsap.registerPlugin(ScrollTrigger)
 
@@ -122,7 +123,10 @@ function PageTransition() {
       curtainRef.current.cover()
       const saved = scrollPositions.get(page.location.key)
       if (saved !== undefined) window.scrollTo(0, saved)
-      waitForPageReady().then(() => setEntry('ready'))
+      // The music downloads either way, so turning sound on later is
+      // instant; Enter only waits for it when the sound is on.
+      const soundtrack = loadSoundtrack()
+      waitForPageReady({ alsoWaitFor: isSoundEnabled() ? [soundtrack] : [] }).then(() => setEntry('ready'))
       return
     }
 
@@ -159,7 +163,9 @@ function PageTransition() {
     document.getElementById('root').inert = entry !== 'entered'
   }, [entry])
 
+  // The music starts first, while still inside the click.
   const enter = () => {
+    enterSoundtrack()
     setEntry('entered')
     openSite()
     lenis?.start()

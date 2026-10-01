@@ -20,8 +20,9 @@ function imagesOnScreen() {
 // on screen is downloaded and decoded (so drawing it doesn't stall the
 // first frames of the reveal), and the browser has painted the result
 // twice. Call it once the page is in place and scrolled to where it will
-// be shown. Never waits longer than READY_TIMEOUT.
-export async function waitForPageReady() {
+// be shown. `alsoWaitFor` adds other promises to wait for (the music on a
+// first visit). Never waits longer than READY_TIMEOUT.
+export async function waitForPageReady({ alsoWaitFor = [] } = {}) {
   const ready = async () => {
     const images = imagesOnScreen()
 
@@ -31,7 +32,11 @@ export async function waitForPageReady() {
       if (image.loading === 'lazy') image.loading = 'eager'
     })
 
-    await Promise.all([document.fonts.ready, ...images.map((image) => image.decode().catch(() => {}))])
+    await Promise.all([
+      document.fonts.ready,
+      ...images.map((image) => image.decode().catch(() => {})),
+      ...alsoWaitFor,
+    ])
     await nextFrame()
     await nextFrame()
   }

@@ -1,18 +1,27 @@
-/* Above the curtain (z-index 3, Curtain.css), centered on its black. */
+/* Above the curtain (z-index 3, Curtain.css), on one line at the center
+   of its black: Enter, then the sound setting. */
 .enter-screen {
   position: fixed;
   inset: 0;
   z-index: 4;
-  display: grid;
-  place-items: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-24);
   color: var(--white);
   pointer-events: none;
 }
 
-.enter-screen__button {
+.enter-screen__button,
+.enter-screen__sound {
   pointer-events: auto;
 }
 
 .enter-screen__button:disabled {
   cursor: default;
+}
+
+/* Secondary to Enter. */
+.enter-screen__sound {
+  color: var(--gray-text);
 }
