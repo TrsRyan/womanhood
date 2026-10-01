@@ -48,6 +48,8 @@ let entered = false
 let enabled = readPreference()
 const listeners = new Set()
 
+// The playing context is created on the Enter click, the gesture browsers
+// require: created any earlier, it starts blocked, and the console says so.
 function getContext() {
   if (!context) {
     context = new AudioContext()
@@ -111,16 +113,19 @@ function fadeOut(duration) {
 }
 
 // Downloads and decodes the music, once. AAC first, MP3 if this browser
-// can't decode AAC (some Linux builds of Firefox). The context is created
-// suspended, which decoding doesn't need to be running for.
+// can't decode AAC (some Linux builds of Firefox). Decoded ahead of the
+// click by an offline context, which never plays so is never blocked; the
+// buffer it returns is then played by the real one (the Web Audio spec
+// lets an AudioBuffer be shared between an OfflineAudioContext and an
+// AudioContext).
 export function loadSoundtrack() {
   loading ??= (async () => {
-    const audio = getContext()
+    const decoder = new OfflineAudioContext(2, 1, 44100)
 
     for (const url of [theChainAac, theChainMp3]) {
       try {
         const response = await fetch(url)
-        buffer = await audio.decodeAudioData(await response.arrayBuffer())
+        buffer = await decoder.decodeAudioData(await response.arrayBuffer())
         break
       } catch {
         // Try the next format; without any, the site stays silent.
