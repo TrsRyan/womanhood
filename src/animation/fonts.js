@@ -1,3 +1,6 @@
+// The site's single font, as the CSS Font Loading API names it.
+const SITE_FONT = '1em "Geist Variable"'
+
 // Resolves once the site's font is downloaded and laid out. Waiting for
 // document.fonts.ready alone isn't enough: it only covers fonts the page
 // has already asked for, and on a first visit Geist may not be asked for
@@ -11,8 +14,13 @@ let fontsLoaded
 
 export function whenFontsLoaded() {
   fontsLoaded ??= document.fonts
-    .load('1em "Geist Variable"')
+    .load(SITE_FONT)
     .catch(() => {})
     .then(() => document.fonts.ready)
   return fontsLoaded
+}
+
+// Whether the font is in at this very moment.
+export function isFontLoaded() {
+  return document.fonts.check(SITE_FONT)
 }

@@ -10,6 +10,7 @@ import RollText from './components/RollText/RollText.jsx'
 import SiteFooter from './components/SiteFooter/SiteFooter.jsx'
 import useTextReveal from './hooks/useTextReveal.js'
 import { createTextReveal } from './animation/textReveal.js'
+import { whenFontsLoaded } from './animation/fonts.js'
 import './App.css'
 import Picture from './components/Picture/Picture.jsx'
 import images from './assets/images.js'
@@ -190,8 +191,16 @@ function App() {
     // The questions get the site's text reveal, played on their own clock
     // rather than the scroll: forward once the playhead passes the end of
     // the morph, the left one first and the right one a beat later, and
-    // backwards, both at once, when it goes back past it.
-    const questionReveals = gsap.utils.toArray('.pin-gallery__question', pinGalleryRef.current).map(createTextReveal)
+    // backwards, both at once, when it goes back past it. They are split,
+    // like every revealed text, only once the font is in.
+    let questionReveals = []
+    let unmounted = false
+    whenFontsLoaded().then(
+      contextSafe(() => {
+        if (unmounted) return
+        questionReveals = gsap.utils.toArray('.pin-gallery__question', pinGalleryRef.current).map(createTextReveal)
+      }),
+    )
     let questionsShown = false
     let questionDelays = []
 
@@ -216,6 +225,7 @@ function App() {
     lead.addEventListener('textsplit', buildTimeline)
 
     return () => {
+      unmounted = true
       stageObserver.disconnect()
       lead.removeEventListener('textsplit', buildTimeline)
       questionDelays.forEach((delay) => delay.kill())

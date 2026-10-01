@@ -2,6 +2,7 @@ import gsap from 'gsap'
 import { CustomEase } from 'gsap/CustomEase'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { SplitText } from 'gsap/SplitText'
+import { isFontLoaded } from './fonts.js'
 
 gsap.registerPlugin(CustomEase, ScrollTrigger, SplitText)
 
@@ -75,32 +76,30 @@ function createKerningMeter(styles) {
   TEXT_METRIC_STYLES.forEach((property) => meter.style.setProperty(property, styles.getPropertyValue(property)))
   meter.style.cssText += 'position:fixed;left:0;top:0;visibility:hidden;pointer-events:none;white-space:pre;'
   document.body.append(meter)
-  console.log('[kerning] meter created', Math.round(performance.now()) + 'ms', 'font loaded:', document.fonts.check('1em "Geist Variable"'), 'fonts status:', document.fonts.status, 'size:', styles.fontSize)
 
+  // A width is only kept once the font is in: measured on the fallback
+  // font, it would carry the wrong font into every text measured after.
   const range = document.createRange()
   const widths = new Map()
   const width = (text) => {
-    if (!widths.has(text)) {
-      meter.textContent = text
-      if (isSafari) {
-        widths.set(text, meter.getBoundingClientRect().width)
-      } else {
-        range.selectNodeContents(meter.firstChild)
-        widths.set(text, range.getBoundingClientRect().width)
-      }
+    if (widths.has(text)) return widths.get(text)
+
+    meter.textContent = text
+    let measured
+    if (isSafari) {
+      measured = meter.getBoundingClientRect().width
+    } else {
+      range.selectNodeContents(meter.firstChild)
+      measured = range.getBoundingClientRect().width
     }
-    return widths.get(text)
+
+    if (isFontLoaded()) widths.set(text, measured)
+    return measured
   }
 
   return {
     fontSize: parseFloat(styles.fontSize),
-    kerning: (...parts) => {
-      const kerning = width(parts.join('')) - parts.reduce((sum, part) => sum + width(part), 0)
-      if (Math.abs(kerning / parseFloat(styles.fontSize)) > 0.08) {
-        console.log('[kerning] odd pair', JSON.stringify(parts.join('')), 'kerning px:', kerning.toFixed(2), 'widths:', parts.map((part) => `${JSON.stringify(part)}=${width(part).toFixed(2)}`).join(' '), 'whole:', width(parts.join('')).toFixed(2), 'at', Math.round(performance.now()) + 'ms', 'font loaded now:', document.fonts.check('1em "Geist Variable"'))
-      }
-      return kerning
-    },
+    kerning: (...parts) => width(parts.join('')) - parts.reduce((sum, part) => sum + width(part), 0),
   }
 }
 
@@ -159,7 +158,8 @@ function createWave(lineChars) {
 // until then. Returns the controls; when to play is the caller's choice
 // (scroll, a timeline moment...). Call it inside a GSAP context so the
 // split and the wave are cleaned up with it, and call `kill()` on cleanup
-// for the resize listener.
+// for the resize listener. Call it only once the font is in
+// (whenFontsLoaded, fonts.js): the split measures the text.
 //
 // - A RollText label is already split into letters and masked by its own
 //   line; those letters are revealed as they are, never split again.
