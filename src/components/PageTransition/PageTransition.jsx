@@ -6,8 +6,7 @@ import { useLenis } from 'lenis/react'
 import Curtain from '../Curtain/Curtain.jsx'
 import EnterScreen from '../EnterScreen/EnterScreen.jsx'
 import { waitForPageReady } from '../../animation/pageReady.js'
-import { openSite } from '../../animation/siteOpen.js'
-import { markPageHidden, markPageShown } from '../../animation/pageShown.js'
+import { markPageArriving, markPageHidden, markPageShown } from '../../animation/pageShown.js'
 import { enterSoundtrack, isSoundEnabled, loadSoundtrack } from '../../audio/soundtrack.js'
 import { startPrefetching } from '../../navigation/prefetch.js'
 
@@ -17,6 +16,10 @@ gsap.registerPlugin(ScrollTrigger)
 // browser must not restore them on its own. Without this, every
 // ScrollTrigger refresh would put back the value it found at startup.
 ScrollTrigger.clearScrollMemory('manual')
+
+// Seconds before the curtain is fully open at which the animations of what
+// is on screen start, so they are under way as it clears.
+const ARRIVAL_LEAD = 0.4
 
 const PAGE_TITLES = {
   '/': 'WoManHood',
@@ -87,7 +90,7 @@ function PageTransition() {
   }, [targetPathname, page, curtainClosed, lenis, scrollPositions])
 
   const reveal = async () => {
-    await curtainRef.current.open()
+    await curtainRef.current.open({ lead: ARRIVAL_LEAD, onLead: markPageArriving })
     markPageShown()
     phase.current = 'idle'
     setCurtainClosed(false)
@@ -172,7 +175,6 @@ function PageTransition() {
     enterSoundtrack()
     setEntry('entered')
     startPrefetching()
-    openSite()
     lenis?.start()
     reveal()
   }

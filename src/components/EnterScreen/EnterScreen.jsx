@@ -2,6 +2,7 @@ import { useEffect, useRef } from 'react'
 import { createPortal } from 'react-dom'
 import useSound from '../../hooks/useSound.js'
 import RollText from '../RollText/RollText.jsx'
+import SoundLabel from '../SoundLabel/SoundLabel.jsx'
 import './EnterScreen.css'
 
 // Shown over the closed curtain on every full page load: "Loading" while
@@ -13,7 +14,7 @@ import './EnterScreen.css'
 // the only focusable controls.
 function EnterScreen({ ready, onEnter }) {
   const buttonRef = useRef(null)
-  const [soundOn, toggleSound] = useSound()
+  const [, toggleSound] = useSound()
 
   useEffect(() => {
     if (ready) buttonRef.current.focus()
@@ -30,9 +31,8 @@ function EnterScreen({ ready, onEnter }) {
       >
         {ready ? <RollText>Enter</RollText> : 'Loading'}
       </button>
-      {/* Keyed by the label, so the letter roll re-splits the new text. */}
       <button type="button" className="enter-screen__sound" onClick={toggleSound}>
-        <RollText key={soundOn ? 'on' : 'off'}>{soundOn ? '(Sound On)' : '(Sound Off)'}</RollText>
+        <SoundLabel />
       </button>
     </div>,
     document.body,

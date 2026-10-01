@@ -2,8 +2,7 @@ import { useGSAP } from '@gsap/react'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { createTextReveal } from '../animation/textReveal.js'
-import { siteOpen } from '../animation/siteOpen.js'
-import { isPageShown, whenPageShown } from '../animation/pageShown.js'
+import { isPageShown, whenPageArriving, whenPageShown } from '../animation/pageShown.js'
 import { whenFontsLoaded } from '../animation/fonts.js'
 import { whenIdle } from '../animation/idle.js'
 
@@ -58,13 +57,14 @@ function useTextReveal(scopeRef, { triggerRef, start = 'top 90%' } = {}) {
             onEnter: () => prepare(element),
           })
 
-          // A text already on screen at load waits for Enter, so it plays
-          // as the site opens rather than behind the enter screen.
+          // A text already on screen when the page arrives waits for the
+          // curtain to nearly finish opening, so its animation is seen in
+          // full rather than played behind the curtain.
           ScrollTrigger.create({
             trigger,
             start,
             refreshPriority: -1,
-            onEnter: () => siteOpen.then(() => prepare(element).play()),
+            onEnter: () => whenPageArriving().then(() => prepare(element).play()),
           })
 
           ScrollTrigger.create({

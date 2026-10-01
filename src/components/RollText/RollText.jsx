@@ -17,11 +17,17 @@ const ROLL_STAGGER = 0.01
 // copy rising from below. It only plays on the way in: once the copy has
 // taken over, both snap back unseen (the two are identical), so every
 // hover rolls upward again. A hover while it plays is ignored rather than
-// restarting it mid-roll. The roll is mouse only, and off when reduced
-// motion is asked.
+// restarting it mid-roll. The hover roll is mouse only, and starts as the
+// pointer enters the link or button holding the text, so a label swapped
+// under a pointer already there doesn't roll again.
+// With `rollFrom`, the same roll changes the text instead: `rollFrom`
+// rolls out and `children` rises in, as soon as it mounts, then
+// `onRollComplete` lets the caller show the new text at rest. Touch
+// screens get this roll too.
+// No roll at all when reduced motion is asked.
 // With `underline`, a line under the label wipes out to the right and back
 // in from the left during the roll.
-function RollText({ children, underline = false }) {
+function RollText({ children, underline = false, rollFrom, onRollComplete }) {
   const rootRef = useRef(null)
   const originalRef = useRef(null)
   const copyRef = useRef(null)
@@ -33,7 +39,12 @@ function RollText({ children, underline = false }) {
     const originalChars = SplitText.create(originalRef.current, { type: 'chars', charsClass: 'roll-text__char' }).chars
     const mm = gsap.matchMedia()
 
-    mm.add('(hover: hover) and (prefers-reduced-motion: no-preference)', () => {
+    mm.add({ hover: '(hover: hover)', reducedMotion: '(prefers-reduced-motion: reduce)' }, ({ conditions }) => {
+      if (conditions.reducedMotion) {
+        if (rollFrom !== undefined) onRollComplete?.()
+        return
+      }
+
       const root = rootRef.current
       const copyChars = SplitText.create(copyRef.current, { type: 'chars' }).chars
 
@@ -57,6 +68,24 @@ function RollText({ children, underline = false }) {
         roll.add(wipe.tweenFromTo(0, wipe.duration(), { ease: ROLL_EASE, duration: roll.duration() }), 0)
       }
 
+      // Changing the text: the roll plays once, and stays where it ends.
+      // The two texts rarely share a width, so the box eases from the old
+      // one's to the new one's along with the letters: nothing next to it
+      // jumps when the new text settles, or gets overlapped while it rolls.
+      if (rollFrom !== undefined) {
+        roll.fromTo(
+          root,
+          { width: root.getBoundingClientRect().width },
+          { width: copyRef.current.getBoundingClientRect().width, ease: ROLL_EASE, duration: roll.duration() },
+          0,
+        )
+        roll.eventCallback('onComplete', () => onRollComplete?.())
+        roll.play()
+        return
+      }
+
+      if (!conditions.hover) return
+
       // A link marking where the reader already is (aria-current) reads as
       // a position, not an invitation, so it doesn't roll. A label with a
       // scroll reveal waits for it to finish (data-text-revealed), since
@@ -67,15 +96,16 @@ function RollText({ children, underline = false }) {
         roll.restart()
       }
 
-      root.addEventListener('mouseenter', onEnter)
-      return () => root.removeEventListener('mouseenter', onEnter)
+      const hoverTarget = root.closest('a, button') ?? root
+      hoverTarget.addEventListener('mouseenter', onEnter)
+      return () => hoverTarget.removeEventListener('mouseenter', onEnter)
     })
   }, { scope: rootRef })
 
   return (
-    <span className="roll-text" ref={rootRef}>
+    <span className={rollFrom === undefined ? 'roll-text' : 'roll-text roll-text--swap'} ref={rootRef}>
       <span className="roll-text__mask">
-        <span className="roll-text__line" ref={originalRef}>{children}</span>
+        <span className="roll-text__line" ref={originalRef}>{rollFrom ?? children}</span>
         <span className="roll-text__line roll-text__line--copy" aria-hidden="true" ref={copyRef}>{children}</span>
       </span>
       {underline && <span className="roll-text__underline" aria-hidden="true" ref={underlineRef} />}

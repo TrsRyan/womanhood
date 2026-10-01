@@ -17,7 +17,8 @@ const CURTAIN_FADE_DURATION = 0.3
 // right to left: closing, each band grows from its right edge; opening, it
 // shrinks towards its left edge. The parent drives it through the ref:
 // close() and open() return a Promise resolved once the move is over,
-// cover() blacks the screen out at once.
+// cover() blacks the screen out at once. open({ lead, onLead }) also calls
+// onLead `lead` seconds before the opening ends.
 function Curtain({ ref }) {
   const rootRef = useRef(null)
   const { contextSafe } = useGSAP({ scope: rootRef })
@@ -65,9 +66,16 @@ function Curtain({ ref }) {
         setClosed(true)
       }),
 
-      open: contextSafe(async () => {
+      open: contextSafe(async ({ lead = 0, onLead } = {}) => {
         const bands = visibleBands()
         setClosed(false)
+
+        if (onLead) {
+          const length = reducedMotion()
+            ? CURTAIN_FADE_DURATION
+            : CURTAIN_DURATION + CURTAIN_STAGGER * (bands.length - 1)
+          gsap.delayedCall(Math.max(0, length - lead), onLead)
+        }
 
         if (reducedMotion()) {
           await fade(0)

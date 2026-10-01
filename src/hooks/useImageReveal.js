@@ -1,7 +1,7 @@
 import { useGSAP } from '@gsap/react'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
-import { siteOpen } from '../animation/siteOpen.js'
+import { whenPageArriving } from '../animation/pageShown.js'
 
 gsap.registerPlugin(ScrollTrigger)
 
@@ -17,7 +17,8 @@ const IMAGE_REVEAL_STAGGER = 0.08
 // Fades in every [data-image-reveal] image inside `scopeRef` on the same
 // beat as the texts: once its top reaches 90% of the screen. It resets
 // only once it is back below the screen, out of sight, so it plays again
-// on the next pass. Those on screen at load wait for Enter.
+// on the next pass. Those on screen when the page arrives wait for the
+// curtain to nearly finish opening, so their fade is seen in full.
 function useImageReveal(scopeRef) {
   useGSAP(() => {
     const mm = gsap.matchMedia()
@@ -37,7 +38,7 @@ function useImageReveal(scopeRef) {
         start: 'top 90%',
         refreshPriority: -1,
         onEnter: (batch) =>
-          siteOpen.then(() =>
+          whenPageArriving().then(() =>
             batch.forEach((image, index) => reveals.get(image).delay(index * IMAGE_REVEAL_STAGGER).restart(true)),
           ),
       })

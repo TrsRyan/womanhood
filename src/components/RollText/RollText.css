@@ -5,23 +5,46 @@
 }
 
 /* One line tall window: the copy waits just below it, out of sight, and
-   each letter rises through it on hover (RollText.jsx). clip rather than
-   hidden: nothing here needs to scroll. Positioned so the absolute copy
-   is clipped too. The underline sits outside it, below the line box. */
+   each letter rises through it on hover (RollText.jsx). Clipped only
+   vertically, and clip rather than hidden: nothing here needs to scroll,
+   and a longer text rolling in (rollFrom) runs past the old one's width
+   instead of being cut. Positioned so the absolute copy is clipped too.
+   The underline sits outside it, below the line box. */
 .roll-text__mask {
   position: relative;
   display: block;
-  overflow: clip;
+  overflow-x: visible;
+  overflow-y: clip;
 }
 
 .roll-text__line {
   display: block;
 }
 
+/* nowrap: a longer incoming text stays on its one line. */
 .roll-text__line--copy {
   position: absolute;
   inset-inline: 0;
   top: 100%;
+  white-space: nowrap;
+}
+
+/* Changing the text (rollFrom): both texts hold to the box's end, where
+   the label meets what follows it, while the box's width eases between
+   theirs (RollText.jsx). A text wider than the box spills towards the
+   start, never over its neighbour. */
+.roll-text--swap .roll-text__mask {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.roll-text--swap .roll-text__line {
+  flex: none;
+}
+
+.roll-text--swap .roll-text__line--copy {
+  left: auto;
+  right: 0;
 }
 
 /* Sized in em to follow the fluid type. The label's box ends 0.22em
