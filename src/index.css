@@ -86,8 +86,12 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
+/* height:auto lets each image's width/height attributes reserve its
+   shape while it loads, without fixing its height: CSS sizing and
+   aspect-ratio rules still decide it. */
 img {
   max-width: 100%;
+  height: auto;
   display: block;
 }
 
