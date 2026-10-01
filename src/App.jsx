@@ -9,6 +9,7 @@ import SiteHeader from './components/SiteHeader/SiteHeader.jsx'
 import RollText from './components/RollText/RollText.jsx'
 import SiteFooter from './components/SiteFooter/SiteFooter.jsx'
 import useTextReveal from './hooks/useTextReveal.js'
+import useImageReveal from './hooks/useImageReveal.js'
 import { createTextReveal } from './animation/textReveal.js'
 import { whenFontsLoaded } from './animation/fonts.js'
 import { whenIdle } from './animation/idle.js'
@@ -51,6 +52,7 @@ function App() {
   const pinGalleryStageRef = useRef(null)
 
   useTextReveal(mainRef)
+  useImageReveal(mainRef)
 
   useGSAP(() => {
     // One timeline over the hero + spacer window: the parallax (yPercent)
@@ -306,12 +308,14 @@ function App() {
                 image={images['intro-primary']}
                 sizes={{ mobile: 100, tablet: 50, desktop: 34 }}
                 frameRatio={PORTRAIT_FRAME}
+                reveal
               />
               <Picture
                 className="intro__image intro__image--secondary"
                 image={images['intro-secondary']}
                 sizes={{ mobile: 50, tablet: 25, desktop: 17 }}
                 frameRatio={PORTRAIT_FRAME}
+                reveal
               />
               <p className="intro__copyright" data-text-reveal>©2023</p>
             </div>
@@ -332,6 +336,7 @@ function App() {
               className="narrative__background"
               image={images['narrative-background']}
               sizes={{ mobile: 100, tablet: 100, desktop: 100 }}
+              reveal
             />
 
             <div className="narrative__header" ref={narrativeHeaderRef}>
@@ -353,6 +358,7 @@ function App() {
               image={images['documentary-cover']}
               sizes={{ mobile: 50, tablet: 17, desktop: 17 }}
               frameRatio={PORTRAIT_FRAME}
+              reveal
             />
 
             <p className="documentary__note" data-text-reveal>
@@ -373,6 +379,7 @@ function App() {
               image={images['documentary-feature']}
               sizes={{ mobile: 100, tablet: 25, desktop: 34 }}
               frameRatio={PORTRAIT_FRAME}
+              reveal
             />
           </section>
 

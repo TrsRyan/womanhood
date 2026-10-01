@@ -13,8 +13,20 @@ const clearPlaceholder = (event) => {
 // so the <img> lays out exactly as if it stood alone; className and ref
 // go to the <img>. `priority` is for the photo on screen at load (fetched
 // first, never lazy); `eager` for photos an animation brings in faster
-// than lazy loading would fetch them.
-function Picture({ image, sizes, frameRatio, scale = 1, alt = '', priority = false, eager = false, className, ref }) {
+// than lazy loading would fetch them. `reveal` gives the photo the site's
+// image entrance (useImageReveal).
+function Picture({
+  image,
+  sizes,
+  frameRatio,
+  scale = 1,
+  alt = '',
+  priority = false,
+  eager = false,
+  reveal = false,
+  className,
+  ref,
+}) {
   const sizesAttribute = pictureSizes(image, sizes, frameRatio, scale)
   const { avif, webp, ...fallback } = image.sources
 
@@ -25,6 +37,7 @@ function Picture({ image, sizes, frameRatio, scale = 1, alt = '', priority = fal
       <img
         ref={ref}
         className={className}
+        data-image-reveal={reveal ? '' : undefined}
         src={image.img.src}
         srcSet={Object.values(fallback)[0]}
         sizes={sizesAttribute}
