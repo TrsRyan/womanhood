@@ -13,14 +13,14 @@ const LOOP_START = 0.5
 const LOOP_END = 0.5 + 2703017 / 44100
 
 // Seconds.
-const FADE_ENTER = 3.5
+const FADE_ENTER = 3.25
 const FADE_TOGGLE = 0.6
 const FADE_HIDDEN = 0.3
 
 // Fades move evenly in decibels, the way hearing perceives loudness, from
 // or down to this level, barely audible: the music rises softly from the
 // very first instant instead of jumping in, as on a straight volume ramp.
-const SILENCE_DB = -50
+const SILENCE_DB = -45
 const FADE_STEPS = 32
 
 const STORAGE_KEY = 'womanhood-sound'
