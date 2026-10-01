@@ -15,13 +15,22 @@ const CURTAIN_FADE_DURATION = 0.3
 
 // Full-screen black curtain made of vertical bands. Both moves sweep from
 // right to left: closing, each band grows from its right edge; opening, it
-// shrinks towards its left edge. The parent drives it through the ref:
-// close() and open() return a Promise resolved once the move is over,
-// cover() blacks the screen out at once. open({ lead, onLead }) also calls
-// onLead `lead` seconds before the opening ends.
-function Curtain({ ref }) {
+// shrinks towards its left edge. `startClosed` blacks the screen out from
+// the first paint. The parent drives it through the ref: close() and
+// open() return a Promise resolved once the move is over. open({ lead,
+// onLead }) also calls onLead `lead` seconds before the opening ends.
+function Curtain({ ref, startClosed = false }) {
   const rootRef = useRef(null)
-  const { contextSafe } = useGSAP({ scope: rootRef })
+
+  // Closed here rather than by a call from the parent: React runs an
+  // effect again whenever it remounts the component (as Strict Mode does
+  // in development), right after the GSAP context has been reverted, so
+  // the bands close again with it instead of being left open.
+  const { contextSafe } = useGSAP(() => {
+    if (!startClosed) return
+    gsap.set('.curtain__band', { scaleX: 1 })
+    rootRef.current.classList.add('curtain--closed')
+  }, { scope: rootRef })
 
   useImperativeHandle(ref, () => {
     // Only the bands the current layout shows, so the stagger timing is
@@ -85,11 +94,6 @@ function Curtain({ ref }) {
           gsap.set(bands, { transformOrigin: 'left' })
           await sweep(bands, { scaleX: 0 })
         }
-      }),
-
-      cover: contextSafe(() => {
-        gsap.set(visibleBands(), { scaleX: 1 })
-        setClosed(true)
       }),
     }
   }, [contextSafe])

@@ -7,7 +7,7 @@ import Curtain from '../Curtain/Curtain.jsx'
 import EnterScreen from '../EnterScreen/EnterScreen.jsx'
 import { waitForPageReady } from '../../animation/pageReady.js'
 import { markPageArriving, markPageHidden, markPageShown } from '../../animation/pageShown.js'
-import { enterSoundtrack, isSoundEnabled, loadSoundtrack } from '../../audio/soundtrack.js'
+import { enterSoundtrack, loadSoundtrack } from '../../audio/soundtrack.js'
 import { startPrefetching } from '../../navigation/prefetch.js'
 
 gsap.registerPlugin(ScrollTrigger)
@@ -20,6 +20,11 @@ ScrollTrigger.clearScrollMemory('manual')
 // Seconds before the curtain is fully open at which the animations of what
 // is on screen start, so they are under way as it clears.
 const ARRIVAL_LEAD = 0.4
+
+// Longest wait (ms) before Enter is offered on a full page load, however
+// much is still downloading: a fast connection is ready well before, a
+// very slow one still gets in.
+const ENTRY_TIMEOUT = 8000
 
 const PAGE_TITLES = {
   '/': 'WoManHood',
@@ -52,6 +57,7 @@ function PageTransition() {
   const outlet = useOutlet()
   const lenis = useLenis()
   const curtainRef = useRef(null)
+  const enterScreenRef = useRef(null)
 
   const [page, setPage] = useState(() => ({ outlet, location, navigationType }))
   // The site loads behind the closed curtain, under the enter screen.
@@ -127,13 +133,16 @@ function PageTransition() {
 
     if (firstPage.current) {
       firstPage.current = false
-      curtainRef.current.cover()
       const saved = scrollPositions.get(page.location.key)
       if (saved !== undefined) window.scrollTo(0, saved)
-      // The music downloads either way, so turning sound on later is
-      // instant; Enter only waits for it when the sound is on.
-      const soundtrack = loadSoundtrack()
-      waitForPageReady({ alsoWaitFor: isSoundEnabled() ? [soundtrack] : [] }).then(() => setEntry('ready'))
+      // Enter starts the music, so it waits for it too, and for every photo
+      // of the page: the site is its photographs, and none should ever be
+      // seen loading.
+      waitForPageReady({
+        alsoWaitFor: [loadSoundtrack()],
+        allImages: true,
+        timeout: ENTRY_TIMEOUT,
+      }).then(() => setEntry('ready'))
       return
     }
 
@@ -168,15 +177,21 @@ function PageTransition() {
 
   useEffect(() => {
     document.getElementById('root').inert = entry !== 'entered'
+    document.documentElement.classList.toggle('is-entering', entry !== 'entered')
   }, [entry])
 
-  // The music starts first, while still inside the click.
+  // The music starts first, while still inside the click. The curtain
+  // opens once the enter screen's texts have fully left. Reached through
+  // the promise, so outside the enter screen's GSAP context: a context
+  // still active would adopt the curtain's, and revert it on unmount.
   const enter = () => {
     enterSoundtrack()
-    setEntry('entered')
     startPrefetching()
-    lenis?.start()
-    reveal()
+    enterScreenRef.current.leave().then(() => {
+      setEntry('entered')
+      lenis?.start()
+      reveal()
+    })
   }
 
   useEffect(() => {
@@ -201,8 +216,8 @@ function PageTransition() {
   return (
     <>
       {shownOutlet}
-      <Curtain ref={curtainRef} />
-      {entry !== 'entered' && <EnterScreen ready={entry === 'ready'} onEnter={enter} />}
+      <Curtain ref={curtainRef} startClosed />
+      {entry !== 'entered' && <EnterScreen ref={enterScreenRef} ready={entry === 'ready'} onEnter={enter} />}
     </>
   )
 }

@@ -23,20 +23,10 @@ const FADE_HIDDEN = 0.3
 const SILENCE_DB = -45
 const FADE_STEPS = 32
 
-const STORAGE_KEY = 'womanhood-sound'
-
 // The music is the point of the site, so on iOS it plays like a music
 // app's would: through the silent switch, pausing other audio (Apple's
 // "playback" category). Must be set before the AudioContext exists.
 if ('audioSession' in navigator) navigator.audioSession.type = 'playback'
-
-const readPreference = () => {
-  try {
-    return localStorage.getItem(STORAGE_KEY) !== 'off'
-  } catch {
-    return true
-  }
-}
 
 let context
 let gain
@@ -45,7 +35,9 @@ let source
 let loading
 let pendingSuspend
 let entered = false
-let enabled = readPreference()
+// On at every visit, as "Enter with Sound" announces; the header's toggle
+// then sets it for the rest of the visit.
+let enabled = true
 const listeners = new Set()
 
 // The playing context is created on the Enter click, the gesture browsers
@@ -153,12 +145,6 @@ export function isSoundEnabled() {
 
 export function setSoundEnabled(on) {
   enabled = on
-  try {
-    localStorage.setItem(STORAGE_KEY, on ? 'on' : 'off')
-  } catch {
-    // Storage can be unavailable (private browsing); the choice then
-    // lasts for this visit only.
-  }
   listeners.forEach((listener) => listener())
 
   if (!entered) return

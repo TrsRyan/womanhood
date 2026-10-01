@@ -8,27 +8,31 @@ gsap.registerPlugin(CustomEase, ScrollTrigger, SplitText)
 
 // A re-split that changes a text's height moves everything below it, so
 // ScrollTrigger must measure the page again. One refresh for every text
-// re-split in the same moment (a resize re-splits many at once).
+// re-split in the same moment (a resize re-splits many at once). A timer
+// rather than a delayedCall: the refresh fires other components' trigger
+// callbacks, which must not run inside the GSAP context of whichever text
+// asked for it (that context would adopt theirs, and revert them with it).
 let pendingRefresh
 function requestRefresh() {
-  pendingRefresh?.kill()
-  pendingRefresh = gsap.delayedCall(0.1, () => ScrollTrigger.refresh())
+  clearTimeout(pendingRefresh)
+  pendingRefresh = setTimeout(() => ScrollTrigger.refresh(), 100)
 }
 
 // Each line's letters rise from just below it one after another, so a
 // wave runs along every line; each line's wave sets off a beat after the
 // one above. The ease covers most of the distance at once, so the text is
 // readable almost immediately and the rest of the duration is a long,
-// soft settle.
-const REVEAL_EASE = CustomEase.create('reveal', '0.17, 0.84, 0.44, 1')
-const REVEAL_DURATION = 1.2
-const CHAR_STAGGER = 0.005
+// soft settle. Exported for text that moves the same way without being
+// split (the enter screen's counter).
+export const REVEAL_EASE = CustomEase.create('reveal', '0.17, 0.84, 0.44, 1')
+export const REVEAL_DURATION = 1.2
+export const CHAR_STAGGER = 0.005
 const LINE_STAGGER = 0.08
 // Each letter fades in on its own, shorter tween: it is fully opaque while
 // still rising, so the fade only softens the mask's hard edge and never
 // hides the wave.
-const FADE_EASE = 'power1.out'
-const FADE_DURATION = 1
+export const FADE_EASE = 'power1.out'
+export const FADE_DURATION = 1
 
 // Geist's ligatures (checked in the font file): pairs drawn as one glyph.
 // Each stays a single letter of the split, so the glyph survives; longest

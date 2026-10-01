@@ -1,27 +1,64 @@
-/* Above the curtain (z-index 3, Curtain.css), on one line at the center
-   of its black: Enter, then the sound setting. */
+/* Above the curtain (z-index 3, Curtain.css), one row across the middle
+   of its black. */
 .enter-screen {
   position: fixed;
   inset: 0;
   z-index: 4;
   display: flex;
   align-items: center;
-  justify-content: center;
-  gap: var(--spacing-24);
+  padding-inline: var(--gutter);
   color: var(--white);
   pointer-events: none;
 }
 
-.enter-screen__button,
-.enter-screen__sound {
+/* Four equal columns: credit in the first, Enter at the end of the
+   third, progress at the end of the fourth. minmax(0, 1fr) keeps a
+   label wider than its column from widening it; the label overflows
+   towards the row's start instead, as in the design. Bottom-aligned for
+   the mobile credit's two lines. */
+.enter-screen__row {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  align-items: end;
+  width: 100%;
+  white-space: nowrap;
+}
+
+.enter-screen__credit {
+  grid-column: 1;
+}
+
+.enter-screen__button {
+  grid-column: 3;
+  justify-self: end;
   pointer-events: auto;
 }
 
-.enter-screen__button:disabled {
-  cursor: default;
+/* Until 100%: in place, so the row's height never changes, but unseen
+   and unreachable. */
+.enter-screen__button--waiting {
+  visibility: hidden;
 }
 
-/* Secondary to Enter. */
-.enter-screen__sound {
-  color: var(--gray-text);
+/* The counter's window: it rises into it, and drops out of it on Enter
+   (EnterScreen.jsx). Equal-width digits keep the right-aligned number
+   from shifting as it counts. */
+.enter-screen__progress {
+  grid-column: 4;
+  justify-self: end;
+  overflow: clip;
+  font-variant-numeric: tabular-nums;
+}
+
+.enter-screen__count {
+  display: inline-block;
+}
+
+/* Phones: the credit breaks after the year, its only breakable space
+   (the one after © doesn't break), at its narrowest width. */
+@media (width < 768px) {
+  .enter-screen__credit {
+    width: min-content;
+    white-space: normal;
+  }
 }

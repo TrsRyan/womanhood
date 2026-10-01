@@ -76,8 +76,8 @@ function SiteFooter() {
 
   // Played on the footer's own uncovering, not on the texts' positions:
   // they sit at its top, under the page until the very end. Starting at
-  // 90% uncovered, the wave is still running as the page clears them.
-  useTextReveal(footerRef, { triggerRef: footerRef, start: 'bottom-=10% bottom' })
+  // 95% uncovered, the wave is still running as the page clears them.
+  useTextReveal(footerRef, { triggerRef: footerRef, start: 'bottom-=5% bottom' })
 
   return (
     <footer className="site-footer" ref={footerRef}>
