@@ -84,8 +84,8 @@ function SiteFooter() {
       <div className="site-footer__content" ref={contentRef}>
         <div className="site-footer__legacy">
           <p data-text-reveal>© 2023 WoManHood</p>
-          <Link to="/legal-notice" data-text-reveal><RollText>Legal Notice</RollText></Link>
           <Link to="/privacy-policy" data-text-reveal><RollText>Privacy Policy</RollText></Link>
+          <Link to="/legal-notice" data-text-reveal><RollText>Legal Notice</RollText></Link>
         </div>
 
         {/* Each letter is drawn twice: filled with the photo, then in black
