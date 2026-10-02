@@ -1,6 +1,12 @@
 # WoManHood
 
-Showcase and archive site for *WoManHood*, a contemporary circus show. Two pages: a scroll-driven homepage built around the show's photographs and music, and an archive of the creation, chapter by chapter.
+![WoManHood homepage](public/og-image.jpg)
+
+**Live site: [womanhood-archive.vercel.app](https://womanhood-archive.vercel.app)**
+
+Showcase and archive site for *WoManHood*, a contemporary circus show: a scroll-driven homepage built around the show's photographs and music, and an archive of the creation, chapter by chapter.
+
+A redesign of a school project first created in November 2023 from a brief given by the company, designed and developed in 2026. Not the official website of the show.
 
 ## Stack
 
@@ -51,3 +57,7 @@ src/
 ├── navigation/             link prefetching
 └── assets/                 photos, music and their registry
 ```
+
+## Credits
+
+Design and development by Ryan Torres. The name *WoManHood*, its photographs, videos and music belong to their respective authors and are used for educational, non-commercial purposes only.
