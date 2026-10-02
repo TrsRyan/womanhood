@@ -29,6 +29,8 @@ const ENTRY_TIMEOUT = 8000
 const PAGE_TITLES = {
   '/': 'WoManHood',
   '/archive': 'WoManHood — Archive',
+  '/legal-notice': 'WoManHood — Legal Notice',
+  '/privacy-policy': 'WoManHood — Privacy Policy',
 }
 const NOT_FOUND_TITLE = 'WoManHood — Page not found'
 

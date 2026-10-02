@@ -39,7 +39,9 @@ In development, optimized images are generated on first request, so photos can t
 
 ```
 src/
-├── App.jsx, Archive.jsx    the two pages
+├── App.jsx, Archive.jsx    the two main pages
+├── LegalPage.jsx           layout shared by Legal Notice and Privacy Policy
+├── NotFound.jsx            404 page
 ├── Root.jsx                shell shared by every page (smooth scroll, transitions)
 ├── pages.js                page loading shared by the router and prefetching
 ├── animation/              text reveal engine, page readiness, timing signals
