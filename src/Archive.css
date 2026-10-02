@@ -181,11 +181,13 @@
     padding-bottom: var(--spacing-160);
   }
 
-  /* No side columns to line up with: a chapter stops at the top, where
-     its sticky title takes over. */
+  /* No side columns to line up with: a chapter reached from the nav stops
+     with its sticky title's band (below) exactly at its resting place.
+     The band reaches this far above the chapter, so stopping any lower
+     would let it stick down over the first lines. */
   .archive__article {
     gap: var(--spacing-14);
-    scroll-margin-top: 0;
+    scroll-margin-top: calc(var(--site-header-height) + var(--spacing-14) - var(--spacing-10));
   }
 
   /* Each chapter title sticks to the top while its chapter is read, then

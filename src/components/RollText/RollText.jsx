@@ -7,6 +7,9 @@ import './RollText.css'
 
 gsap.registerPlugin(CustomEase, SplitText)
 
+// Where the rolls play: a mouse to hover with, and motion allowed.
+const ROLLS = '(hover: hover) and (prefers-reduced-motion: no-preference)'
+
 // A short wind-up, then a fast rise that brakes long (Osmo's button curve).
 const ROLL_EASE = CustomEase.create('roll', 'M0,0 C0.625,0.05 0,1 1,1')
 const ROLL_DURATION = 0.8
@@ -22,9 +25,9 @@ const ROLL_STAGGER = 0.01
 // under a pointer already there doesn't roll again.
 // With `rollFrom`, the same roll changes the text instead: `rollFrom`
 // rolls out and `children` rises in, as soon as it mounts, then
-// `onRollComplete` lets the caller show the new text at rest. Touch
-// screens get this roll too.
-// No roll at all when reduced motion is asked.
+// `onRollComplete` lets the caller show the new text at rest. Without
+// the hover roll (touch screens, reduced motion), the text changes at
+// once.
 // With `underline`, a line under the label wipes out to the right and back
 // in from the left during the roll.
 function RollText({ children, underline = false, rollFrom, onRollComplete }) {
@@ -34,17 +37,19 @@ function RollText({ children, underline = false, rollFrom, onRollComplete }) {
   const underlineRef = useRef(null)
 
   useGSAP(() => {
+    // Called during layout, so the caller's new text replaces the old one
+    // before it is ever painted.
+    if (rollFrom !== undefined && !window.matchMedia(ROLLS).matches) {
+      onRollComplete?.()
+      return
+    }
+
     // Split on every device, not only for the hover: useTextReveal reveals
     // these same letters (found by their class) when the label scrolls in.
     const originalChars = SplitText.create(originalRef.current, { type: 'chars', charsClass: 'roll-text__char' }).chars
     const mm = gsap.matchMedia()
 
-    mm.add({ hover: '(hover: hover)', reducedMotion: '(prefers-reduced-motion: reduce)' }, ({ conditions }) => {
-      if (conditions.reducedMotion) {
-        if (rollFrom !== undefined) onRollComplete?.()
-        return
-      }
-
+    mm.add(ROLLS, () => {
       const root = rootRef.current
       const copyChars = SplitText.create(copyRef.current, { type: 'chars' }).chars
 
@@ -83,8 +88,6 @@ function RollText({ children, underline = false, rollFrom, onRollComplete }) {
         roll.play()
         return
       }
-
-      if (!conditions.hover) return
 
       // A link marking where the reader already is (aria-current) reads as
       // a position, not an invitation, so it doesn't roll. A label with a
