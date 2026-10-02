@@ -31,7 +31,7 @@ const SECTIONS = [
       <>
         Design & development: Ryan Torres
         <br />
-        Typeface: Geist
+        Typeface: Geist, by Vercel
       </>
     ),
   },
