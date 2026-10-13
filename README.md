@@ -2,7 +2,7 @@
 
 ![WoManHood homepage](public/og-image.jpg)
 
-**Live site: [womanhood-archive.vercel.app](https://womanhood-archive.vercel.app)**
+**Live site: [womanhood.torres-ryan.com](https://womanhood.torres-ryan.com)**
 
 Showcase and archive site for *WoManHood*, a contemporary circus show: a scroll-driven homepage built around the show's photographs and music, and an archive of the creation, chapter by chapter.
 
