@@ -292,9 +292,9 @@ function App() {
               </p>
             </div>
 
-            <span className="hero__title-clip">
-              <span className="sr-only">WoManHood</span>
-            </span>
+            <div className="hero__title-clip">
+              <h1 className="sr-only">WoManHood</h1>
+            </div>
           </section>
 
           <div className="transition-image__spacer" aria-hidden="true" ref={transitionSpacerRef} />

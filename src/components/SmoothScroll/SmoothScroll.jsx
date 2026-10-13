@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { ReactLenis, useLenis } from 'lenis/react'
@@ -6,11 +6,23 @@ import 'lenis/dist/lenis.css'
 
 gsap.registerPlugin(ScrollTrigger)
 
+const REDUCE_MOTION = '(prefers-reduced-motion: reduce)'
+
 // Lenis's documented GSAP setup, shared by every page: gsap.ticker drives
 // Lenis (autoRaf off), and each Lenis scroll updates ScrollTrigger, so
 // smooth scroll and scroll animations run on one clock.
 function SmoothScroll({ children }) {
   const lenisRef = useRef(null)
+
+  // Reduced motion: wheel scrolling goes back to native steps.
+  const [reduced, setReduced] = useState(() => window.matchMedia(REDUCE_MOTION).matches)
+
+  useEffect(() => {
+    const mq = window.matchMedia(REDUCE_MOTION)
+    const apply = () => setReduced(mq.matches)
+    mq.addEventListener('change', apply)
+    return () => mq.removeEventListener('change', apply)
+  }, [])
 
   useLenis(ScrollTrigger.update)
 
@@ -31,7 +43,7 @@ function SmoothScroll({ children }) {
   }, [])
 
   return (
-    <ReactLenis root options={{ autoRaf: false }} ref={lenisRef}>
+    <ReactLenis root options={{ autoRaf: false, smoothWheel: !reduced }} ref={lenisRef}>
       {children}
     </ReactLenis>
   )
