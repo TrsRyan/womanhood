@@ -58,6 +58,10 @@ src/
 └── assets/                 photos, music and their registry
 ```
 
+## AI use
+
+I built this project with Claude Code. The Figma design, the choice of tools, the animations and the testing on real devices are mine. Claude Code wrote the code from those decisions, and I am responsible for the result.
+
 ## Credits
 
-Design and development by Ryan Torres. The name *WoManHood*, its photographs, videos and music belong to their respective authors and are used for educational, non-commercial purposes only.
+The name *WoManHood*, its photographs, videos and music belong to their respective authors and are used for educational, non-commercial purposes only.
